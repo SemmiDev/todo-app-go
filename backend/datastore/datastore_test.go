@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -22,6 +23,8 @@ var testPostgreStore *DBStore
 // testMapStore is a global map store to be used in tests
 var testMapStore *MapStore
 
+// note: array store does not support because index starts from 0 :(
+
 // TestMain is the main function to be executed when running tests
 func TestMain(m *testing.M) {
 	// set up test database
@@ -31,7 +34,8 @@ func TestMain(m *testing.M) {
 	// set up map store
 	testMapStore = NewMapStore()
 
-	var store DataStore
+	store, storeType := New(ArrayDataStore)
+	log.Printf("test running on [%s]\n", storeType)
 
 	// uncomment the following line if you want to switch to other store
 	store = testPostgreStore
