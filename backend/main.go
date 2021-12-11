@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"reflect"
 
 	"github.com/Xanvial/todo-app-go/backend/datastore"
 	"github.com/gorilla/handlers"
@@ -27,6 +28,7 @@ func main() {
 	// data := datastore.NewArrayStore()
 	// data := datastore.NewMapStore()
 	data := datastore.NewDBStore()
+	fmt.Println("currently using [", reflect.TypeOf(data), "] datasore")
 
 	// get completed todo "/todo/completed"
 	router.HandleFunc("/todo/completed", data.GetCompleted).Methods(http.MethodGet)
