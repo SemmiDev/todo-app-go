@@ -24,8 +24,9 @@ func main() {
 	router.HandleFunc("/ping", Ping).Methods(http.MethodGet)
 
 	// add needed datastore
-	var data datastore.DataStore
-	data = datastore.NewDBStore() // implement this
+	// data := datastore.NewArrayStore()
+	// data := datastore.NewMapStore()
+	data := datastore.NewDBStore()
 
 	// get completed todo "/todo/completed"
 	router.HandleFunc("/todo/completed", data.GetCompleted).Methods(http.MethodGet)
@@ -34,9 +35,9 @@ func main() {
 	// add todo
 	router.HandleFunc("/add", data.CreateTodo).Methods(http.MethodPost)
 	// update todo status
-	router.HandleFunc("/update/{title}", data.UpdateTodo).Methods(http.MethodPut)
+	router.HandleFunc("/update/{id}", data.UpdateTodo).Methods(http.MethodPut)
 	// delete todo
-	router.HandleFunc("/delete/{title}", data.DeleteTodo).Methods(http.MethodDelete)
+	router.HandleFunc("/delete/{id}", data.DeleteTodo).Methods(http.MethodDelete)
 
 	// server static resource last
 	// this assumes main.go is called from root project,
