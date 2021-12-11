@@ -25,7 +25,7 @@ func main() {
 
 	// add needed datastore
 	var data datastore.DataStore
-	data = datastore.NewArrayStore() // implement this
+	data = datastore.NewDBStore() // implement this
 
 	// get completed todo "/todo/completed"
 	router.HandleFunc("/todo/completed", data.GetCompleted).Methods(http.MethodGet)

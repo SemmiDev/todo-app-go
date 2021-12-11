@@ -1,0 +1,18 @@
+version: '3'
+services:
+  todo_app_postgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: todo-db
+      POSTGRES_USER: toped
+      POSTGRES_PASSWORD: toped
+      TZ: Asia/Jakarta
+      PGTZ: Asia/Jakarta
+    volumes:
+      - todo_db_data:/var/lib/postgresql/data
+
+volumes:
+  todo_db_data:
+    driver: local

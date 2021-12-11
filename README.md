@@ -15,6 +15,18 @@ backend
  |    └──  interface.go     # Contains interface struct with all function that needs to be implemented
  ├── webstatic              # Frontend Codes, taken from https://github.com/themaxsandelin/todo
  └── main.go                # Main program of the app
+migration                   # DB Migration data folder, contains up/down sql queries
+ └── main.go                # Script to trigger sql queries
 model
  └── model.go               # Data model of main object
 ```
+
+## Database using Docker
+1. Make sure docker already installed
+2. Run docker compose using `make docker-start`
+3. Wait until postgres downloaded
+4. On first run, create the table using `make db-init`
+
+## Postgres already installed
+1. Update the config value in `model/config.go` to installed postgres configuration
+2. create the table using `make db-init`
