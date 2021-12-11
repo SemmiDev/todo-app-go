@@ -34,7 +34,7 @@ func TestMain(m *testing.M) {
 	// set up map store
 	testMapStore = NewMapStore()
 
-	store, storeType := New(ArrayDataStore)
+	store, storeType := New(MapDataStore)
 	log.Printf("test running on [%s]\n", storeType)
 
 	// uncomment the following line if you want to switch to other store

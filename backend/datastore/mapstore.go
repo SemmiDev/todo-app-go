@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"sync"
@@ -86,8 +87,19 @@ func (ms *MapStore) UpdateTodo(w http.ResponseWriter, r *http.Request) {
 	defer ms.m.Unlock()
 
 	vars := mux.Vars(r)
-	ID, _ := strconv.Atoi(vars["id"])
-	status, _ := strconv.ParseBool(r.FormValue("status"))
+	ID, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		log.Println("error on deleting todo:", err)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	status, err := strconv.ParseBool(r.FormValue("status"))
+	if err != nil {
+		log.Println("error on updating todo:", err)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
 
 	for todoID, todo := range ms.data {
 		if todoID == ID {
@@ -102,7 +114,12 @@ func (ms *MapStore) DeleteTodo(w http.ResponseWriter, r *http.Request) {
 	defer ms.m.Unlock()
 
 	vars := mux.Vars(r)
-	ID, _ := strconv.Atoi(vars["id"])
+	ID, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		log.Println("error on deleting todo:", err)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
 	delete(ms.data, ID)
 }
 
