@@ -6,6 +6,9 @@ run:
 build:
 	@go build -v -o bin/todoapp backend/main.go
 
+build-exe:
+	@go build -v -o bin/todoapp.exe backend/main.go
+
 db-init:
 	@go run migration/main.go init
 	@go run migration/main.go up
