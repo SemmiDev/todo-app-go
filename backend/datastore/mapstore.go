@@ -22,6 +22,8 @@ type MapStore struct {
 func NewMapStore() *MapStore {
 	newData := make(map[int]*model.TodoData, 0)
 	return &MapStore{
+                m: sync.RWMutex{},
+                key: 0,
 		data: newData,
 	}
 }
