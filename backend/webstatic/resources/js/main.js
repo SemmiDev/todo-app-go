@@ -108,7 +108,7 @@ function removeItem() {
 
 function removeItemInBackend(id, value) {
   $.ajax({
-    url: server + "delete/" + value, // TODO: change value to id
+    url: server + "delete/" + id, // TODO: change value to id
     type: 'DELETE',
     async: false,
     success: function (data) {
@@ -144,7 +144,7 @@ function completeItem() {
 function updateBackendItem(id, value, status) {
   payload = { 'status': status };
   $.ajax({
-    url: server + "update/" + value, // TODO: change value to id
+    url: server + "update/" + id, // TODO: change value to id
     type: 'PUT',
     data: payload,
     async: false,
