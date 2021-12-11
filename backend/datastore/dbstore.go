@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/Xanvial/todo-app-go/model"
+	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 )
 
@@ -44,7 +46,7 @@ func (ds *DBStore) GetCompleted(w http.ResponseWriter, r *http.Request) {
 		WHERE status = true
 	`
 
-	rows, err := ds.db.Query(query)
+	rows, err := ds.db.QueryContext(r.Context(), query)
 	if err != nil {
 		log.Println("error on getting todo:", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -62,17 +64,86 @@ func (ds *DBStore) GetCompleted(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(completed)
+	json.NewEncoder(w).Encode(&completed)
 }
 
 func (ds *DBStore) GetIncomplete(w http.ResponseWriter, r *http.Request) {
+	var completed []model.TodoData
+
+	query := `
+		SELECT id, title, status
+		FROM todo
+		WHERE status = false
+	`
+
+	rows, err := ds.db.QueryContext(r.Context(), query)
+	if err != nil {
+		log.Println("error on getting todo:", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var data model.TodoData
+		if err := rows.Scan(&data.ID, &data.Title, &data.Status); err != nil {
+			log.Println("error on getting todo:", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+
+		completed = append(completed, data)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(&completed)
 }
 
 func (ds *DBStore) CreateTodo(w http.ResponseWriter, r *http.Request) {
+	title := r.FormValue("title")
+
+	query := `
+		INSERT INTO todo (title) 
+		VALUES ($1) 
+		RETURNING id, title, status
+	`
+
+	row := ds.db.QueryRowContext(r.Context(), query, title)
+	var todo model.TodoData
+	if err := row.Scan(
+		&todo.ID,
+		&todo.Title,
+		&todo.Status,
+	); err != nil {
+		log.Println("error on creating todo:", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(&todo)
 }
 
 func (ds *DBStore) UpdateTodo(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	ID, _ := strconv.Atoi(vars["id"])
+	status, _ := strconv.ParseBool(r.FormValue("status"))
+
+	query := `UPDATE todo SET status = $2 WHERE id = $1`
+
+	_, err := ds.db.ExecContext(r.Context(), query, ID, status)
+	if err != nil {
+		log.Println("error on updating todo:", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
 }
 
 func (ds *DBStore) DeleteTodo(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	ID, _ := strconv.Atoi(vars["id"])
+
+	query := `DELETE FROM todo WHERE id = $1`
+
+	_, err := ds.db.ExecContext(r.Context(), query, ID)
+	if err != nil {
+		log.Println("error on updating todo:", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
 }
