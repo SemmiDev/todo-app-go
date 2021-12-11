@@ -1,6 +1,9 @@
 package datastore
 
-import "net/http"
+import (
+	"log"
+	"net/http"
+)
 
 // DataStoreType is the type of the datastore
 type DataStoreType uint
@@ -13,17 +16,21 @@ const (
 )
 
 // New creates a new datastore
-func New(storeType DataStoreType) (DataStore, string) {
+func New(storeType DataStoreType) DataStore {
 	// switch the storeType and return the appropriate datastore
 	switch storeType {
 	case ArrayDataStore:
-		return NewArrayStore(), "Array Data Store"
+		log.Println("Currently Using Array Data Store")
+		return NewArrayStore()
 	case MapDataStore:
-		return NewMapStore(), "Map Data Store"
+		log.Println("Currently Using Map Data Store")
+		return NewMapStore()
 	case PostgreDataStore:
-		return NewDBStore(), "Postgre SQL Data Store"
+		log.Println("Currently Using Postgre SQL Data Store")
+		return NewDBStore()
 	default:
-		return NewMapStore(), "Array Data Store"
+		log.Println("Currently Using Map Data Store")
+		return NewMapStore()
 	}
 }
 

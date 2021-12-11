@@ -2,7 +2,6 @@ package datastore
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -34,8 +33,8 @@ func TestMain(m *testing.M) {
 	// set up map store
 	testMapStore = NewMapStore()
 
-	store, storeType := New(MapDataStore)
-	log.Printf("test running on [%s]\n", storeType)
+	// choose the datastore
+	store := New(MapDataStore)
 
 	// uncomment the following line if you want to switch to other store
 	store = testPostgreStore
