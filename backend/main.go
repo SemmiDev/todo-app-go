@@ -18,13 +18,15 @@ import (
 var htmlData embed.FS
 
 func main() {
-
+	// create a new router
 	router := mux.NewRouter()
 
-	// create endpoint handler
-	router.HandleFunc("/ping", Ping).Methods(http.MethodGet)
+	// create the endpoint for the ping
+	router.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "pong")
+	}).Methods(http.MethodGet)
 
-	// add needed datastore
+	// add needed datastore & uncomment the following line to use it
 	// data := datastore.NewArrayStore()
 	// data := datastore.NewMapStore()
 	data := datastore.NewDBStore()
@@ -63,8 +65,4 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func Ping(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "pong")
 }

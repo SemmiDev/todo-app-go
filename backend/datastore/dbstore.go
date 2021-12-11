@@ -13,10 +13,12 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// DBStore is a struct that contains a database abstraction
 type DBStore struct {
 	db *sql.DB
 }
 
+// NewDBStore creates a new DBStore
 func NewDBStore() *DBStore {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		model.DBHost, model.DBPort, model.DBUser, model.DBPassword, model.DBName)
@@ -32,13 +34,18 @@ func NewDBStore() *DBStore {
 
 	log.Println("DB Successfully connected!")
 
+	// setup the connection pool
+	db.SetMaxOpenConns(10)
+	db.SetMaxIdleConns(10)
+
 	return &DBStore{
 		db: db,
 	}
 }
 
+// GetCompleted returns all completed todos
 func (ds *DBStore) GetCompleted(w http.ResponseWriter, r *http.Request) {
-	var completed []model.TodoData
+	var completed []*model.TodoData
 
 	query := `
 		SELECT id, title, status
@@ -59,16 +66,16 @@ func (ds *DBStore) GetCompleted(w http.ResponseWriter, r *http.Request) {
 			log.Println("error on getting todo:", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
-
-		completed = append(completed, data)
+		completed = append(completed, &data)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(&completed)
+	json.NewEncoder(w).Encode(completed)
 }
 
+// GetIncomplete returns all incomplete todos
 func (ds *DBStore) GetIncomplete(w http.ResponseWriter, r *http.Request) {
-	var completed []model.TodoData
+	var completed []*model.TodoData
 
 	query := `
 		SELECT id, title, status
@@ -90,13 +97,14 @@ func (ds *DBStore) GetIncomplete(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 
-		completed = append(completed, data)
+		completed = append(completed, &data)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(&completed)
+	json.NewEncoder(w).Encode(completed)
 }
 
+// CreateTodo creates a new todo with the given title
 func (ds *DBStore) CreateTodo(w http.ResponseWriter, r *http.Request) {
 	title := r.FormValue("title")
 
@@ -121,6 +129,7 @@ func (ds *DBStore) CreateTodo(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(&todo)
 }
 
+// UpdateTodo updates a todo with the given ID
 func (ds *DBStore) UpdateTodo(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	ID, _ := strconv.Atoi(vars["id"])
@@ -135,6 +144,7 @@ func (ds *DBStore) UpdateTodo(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// DeleteTodo deletes a todo with the given ID
 func (ds *DBStore) DeleteTodo(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	ID, _ := strconv.Atoi(vars["id"])

@@ -2,6 +2,7 @@ package datastore
 
 import "net/http"
 
+// Datastore is the interface that wraps the basic Get, Put and Delete methods.
 type DataStore interface {
 	GetCompleted(w http.ResponseWriter, r *http.Request)
 	GetIncomplete(w http.ResponseWriter, r *http.Request)

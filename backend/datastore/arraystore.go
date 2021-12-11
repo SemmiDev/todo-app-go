@@ -2,32 +2,40 @@ package datastore
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"strconv"
+	"sync"
 
 	"github.com/Xanvial/todo-app-go/model"
 	"github.com/gorilla/mux"
 )
 
+// ArrayStore is a datastore that stores data in slice
 type ArrayStore struct {
-	data []model.TodoData
+	// m is a mutex to ensure thread safety
+	m sync.RWMutex
+	// data is a slice of todo data
+	data []*model.TodoData
 }
 
+// NewArrayStore creates a new ArrayStore
 func NewArrayStore() *ArrayStore {
-	newData := make([]model.TodoData, 0)
+	newData := make([]*model.TodoData, 0)
 
 	return &ArrayStore{
 		data: newData,
 	}
 }
 
+// GetCompleted returns completed data
 func (as *ArrayStore) GetCompleted(w http.ResponseWriter, r *http.Request) {
-	// get completed data
-	completed := make([]model.TodoData, 0)
+	as.m.RLock()
+	defer as.m.RUnlock()
+
+	completed := make([]*model.TodoData, 0)
 	for _, d := range as.data {
 		if d.Status {
-			completed = append(completed, d)
+			completed = append(completed, copy(d))
 		}
 	}
 
@@ -35,13 +43,16 @@ func (as *ArrayStore) GetCompleted(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(completed)
 }
 
+// GetIncomplete returns incomplete data
 func (as *ArrayStore) GetIncomplete(w http.ResponseWriter, r *http.Request) {
+	as.m.RLock()
+	defer as.m.RUnlock()
 
 	// get incomplete data
-	incomplete := make([]model.TodoData, 0)
+	incomplete := make([]*model.TodoData, 0)
 	for _, d := range as.data {
 		if !d.Status {
-			incomplete = append(incomplete, d)
+			incomplete = append(incomplete, copy(d))
 		}
 	}
 
@@ -49,22 +60,25 @@ func (as *ArrayStore) GetIncomplete(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(incomplete)
 }
 
+// CreateTodo creates a new todo
 func (as *ArrayStore) CreateTodo(w http.ResponseWriter, r *http.Request) {
-	title := r.FormValue("title")
+	as.m.Lock()
+	defer as.m.Unlock()
 
-	log.Println("ArrayStore | title:", title)
-	as.data = append(as.data, model.TodoData{
+	title := r.FormValue("title")
+	as.data = append(as.data, &model.TodoData{
 		Title: title,
 	})
 }
 
+// UpdateTodo updates a todo
 func (as *ArrayStore) UpdateTodo(w http.ResponseWriter, r *http.Request) {
+	as.m.Lock()
+	defer as.m.Unlock()
+
 	vars := mux.Vars(r)
 	title := vars["title"]
 	status, _ := strconv.ParseBool(r.FormValue("status"))
-
-	log.Println("ArrayStore | title:", title)
-	log.Println("ArrayStore | status:", status)
 
 	for idx, d := range as.data {
 		if d.Title == title {
@@ -73,22 +87,17 @@ func (as *ArrayStore) UpdateTodo(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// DeleteTodo deletes a todo
 func (as *ArrayStore) DeleteTodo(w http.ResponseWriter, r *http.Request) {
+	as.m.Lock()
+	defer as.m.Unlock()
+
 	vars := mux.Vars(r)
 	title := vars["title"]
 
-	log.Println("ArrayStore | title:", title)
-
-	// get deleted index
-	delIdx := -1
 	for idx, d := range as.data {
 		if d.Title == title {
-			delIdx = idx
-			break
+			as.data = append(as.data[:idx], as.data[idx+1:]...)
 		}
-	}
-
-	if delIdx != -1 {
-		as.data = append(as.data[:delIdx], as.data[delIdx+1:]...)
 	}
 }

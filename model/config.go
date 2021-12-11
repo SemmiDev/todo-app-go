@@ -4,7 +4,7 @@ package model
 const (
 	DBHost     = "localhost"
 	DBPort     = 5432
-	DBUser     = "toped"
-	DBPassword = "toped"
+	DBUser     = "sammidev"
+	DBPassword = "sammidev"
 	DBName     = "todo-db"
 )
