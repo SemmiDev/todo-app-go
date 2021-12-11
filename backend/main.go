@@ -6,7 +6,6 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
-	"reflect"
 
 	"github.com/Xanvial/todo-app-go/backend/datastore"
 	"github.com/gorilla/handlers"
@@ -22,26 +21,24 @@ func main() {
 	router := mux.NewRouter()
 
 	// create the endpoint for the ping
-	router.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "pong")
-	}).Methods(http.MethodGet)
+	router.HandleFunc("/ping", ping).Methods(http.MethodGet)
 
-	// add needed datastore & uncomment the following line to use it
-	// data := datastore.NewArrayStore()
-	// data := datastore.NewMapStore()
-	data := datastore.NewDBStore()
-	fmt.Println("currently using [", reflect.TypeOf(data), "] datasore")
+	// define or choose type of data store
+	dataStore, storeType := datastore.New(
+		datastore.PostgreDataStore,
+	)
+	fmt.Printf("Currently Using [%s]\n", storeType)
 
 	// get completed todo "/todo/completed"
-	router.HandleFunc("/todo/completed", data.GetCompleted).Methods(http.MethodGet)
+	router.HandleFunc("/todo/completed", dataStore.GetCompleted).Methods(http.MethodGet)
 	// get incomplete todo "/todo/incomplete"
-	router.HandleFunc("/todo/incomplete", data.GetIncomplete).Methods(http.MethodGet)
+	router.HandleFunc("/todo/incomplete", dataStore.GetIncomplete).Methods(http.MethodGet)
 	// add todo
-	router.HandleFunc("/add", data.CreateTodo).Methods(http.MethodPost)
+	router.HandleFunc("/add", dataStore.CreateTodo).Methods(http.MethodPost)
 	// update todo status
-	router.HandleFunc("/update/{id}", data.UpdateTodo).Methods(http.MethodPut)
+	router.HandleFunc("/update/{id}", dataStore.UpdateTodo).Methods(http.MethodPut)
 	// delete todo
-	router.HandleFunc("/delete/{id}", data.DeleteTodo).Methods(http.MethodDelete)
+	router.HandleFunc("/delete/{id}", dataStore.DeleteTodo).Methods(http.MethodDelete)
 
 	// server static resource last
 	// this assumes main.go is called from root project,
@@ -65,4 +62,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func ping(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "pong")
 }
