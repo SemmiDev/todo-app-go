@@ -9,6 +9,9 @@ build:
 build-exe:
 	@go build -v -o bin/todoapp.exe backend/main.go
 
+datastore-test:
+	@go test -v -cover -coverprofile=cover.out -covermode=atomic ./backend/datastore
+
 db-init:
 	@go run migration/main.go init
 	@go run migration/main.go up
