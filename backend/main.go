@@ -16,7 +16,7 @@ func main() {
 	// define the data store type & create the server
 	s := api.NewServer(
 		// use the map/arrary/db data store
-		datastore.ArrayDataStore,
+		datastore.PostgreDataStore,
 		// use the embedded html files
 		htmlData,
 	)
