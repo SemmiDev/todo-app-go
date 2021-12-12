@@ -1,4 +1,4 @@
-package datastore
+package api
 
 import (
 	"encoding/json"
@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/Xanvial/todo-app-go/backend/datastore"
 	"github.com/Xanvial/todo-app-go/model"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/require"
@@ -17,10 +18,10 @@ import (
 var app *mux.Router
 
 // testPostgreStore is a global postgre store to be used in tests
-var testPostgreStore *DBStore
+var testPostgreStore *datastore.DBStore
 
 // testMapStore is a global map store to be used in tests
-var testMapStore *MapStore
+var testMapStore *datastore.MapStore
 
 // note: array store does not support because index starts from 0 :(
 
@@ -29,16 +30,13 @@ func TestMain(m *testing.M) {
 	// set up test database
 	app = mux.NewRouter()
 	// set up postgre store
-	testPostgreStore = NewDBStore()
+	testPostgreStore = datastore.NewDBStore()
 	// set up map store
-	testMapStore = NewMapStore()
+	testMapStore = datastore.NewMapStore()
 
 	// choose the datastore
-	store := New(MapDataStore)
-
-	// uncomment the following line if you want to switch to other store
-	store = testPostgreStore
-	store = testMapStore
+	// store := testPostgreStore
+	store := testMapStore
 
 	// set up routes
 	app.HandleFunc("/todo/completed", store.GetCompleted).Methods(http.MethodGet)
@@ -53,8 +51,8 @@ func TestMain(m *testing.M) {
 
 // truncateTable truncates the table
 func truncateTable() {
-	testPostgreStore.db.Exec(`TRUNCATE todo RESTART IDENTITY CASCADE`)
-	testMapStore.key = 0 // reset key
+	testPostgreStore.GetDB().Exec(`TRUNCATE todo RESTART IDENTITY CASCADE`)
+	testMapStore.SetKey(0) // reset key
 }
 
 // TestCreateTodo tests the creation of a todo
@@ -75,6 +73,17 @@ func TestCreateTodo(t *testing.T) {
 	require.Equal(t, int(1), todo.ID)
 	require.Equal(t, "testTodo", todo.Title)
 	require.Equal(t, false, todo.Status)
+}
+
+// TestCreateTodo tests the creation of a todo: failed
+func TestCreateTodoFailed(t *testing.T) {
+	truncateTable()
+
+	req, _ := http.NewRequest("POST", "/add", strings.NewReader("XXX=testTodo"))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	response := executeRequest(req)
+	checkResponseCode(t, http.StatusBadRequest, response.Code)
 }
 
 // TestGetIncompleteTodos tests the retrieval of incomplete todos
@@ -103,6 +112,28 @@ func TestUpdateTodo(t *testing.T) {
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	response := executeRequest(req)
 	checkResponseCode(t, http.StatusOK, response.Code)
+}
+
+// TestUpdateTodo tests the update of a todo: failed
+func TestUpdateTodoFailed(t *testing.T) {
+	// create a todo
+	TestCreateTodo(t)
+
+	req, _ := http.NewRequest("PUT", "/update/XXX", strings.NewReader("status=true"))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	response := executeRequest(req)
+	checkResponseCode(t, http.StatusBadRequest, response.Code)
+}
+
+// TestUpdateTodo tests the update of a todo: failed
+func TestUpdateTodoFailedFormValue(t *testing.T) {
+	// create a todo
+	TestCreateTodo(t)
+
+	req, _ := http.NewRequest("PUT", "/update/XXX", strings.NewReader("status=XXX"))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	response := executeRequest(req)
+	checkResponseCode(t, http.StatusBadRequest, response.Code)
 }
 
 // TestGetcompletedTodos tests the retrieval of completed todos

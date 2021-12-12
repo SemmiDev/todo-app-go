@@ -18,6 +18,11 @@ type DBStore struct {
 	db *sql.DB
 }
 
+// GetDB return db abstraction for using in api test
+func (ds *DBStore) GetDB() *sql.DB {
+	return ds.db
+}
+
 // NewDBStore creates a new DBStore
 func NewDBStore() *DBStore {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
@@ -111,6 +116,11 @@ func (ds *DBStore) GetIncomplete(w http.ResponseWriter, r *http.Request) {
 // CreateTodo creates a new todo with the given title
 func (ds *DBStore) CreateTodo(w http.ResponseWriter, r *http.Request) {
 	title := r.FormValue("title")
+	if title == "" {
+		log.Println("form title is empty")
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
 
 	query := `
 		INSERT INTO todo (title) 

@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"sync"
@@ -66,6 +67,12 @@ func (as *ArrayStore) CreateTodo(w http.ResponseWriter, r *http.Request) {
 	defer as.m.Unlock()
 
 	title := r.FormValue("title")
+	if title == "" {
+		log.Println("form title is empty")
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
 	as.data = append(as.data, &model.TodoData{
 		Title: title,
 	})

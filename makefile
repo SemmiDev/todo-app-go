@@ -13,8 +13,8 @@ run-exe:
 	@go build -v -o bin/todoapp.exe backend/main.go
 	@./bin/todoapp.exe
 
-datastore-test:
-	@go test -v -cover -coverprofile=cover.out -covermode=atomic ./backend/datastore
+api-test:
+	@go test -v ./backend/api
 
 db-init:
 	@go run migration/main.go init

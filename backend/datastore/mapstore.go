@@ -21,6 +21,10 @@ type MapStore struct {
 	data map[int]*model.TodoData
 }
 
+func (ms *MapStore) SetKey(i int) {
+	ms.key = 0
+}
+
 // NewMapStore creates a new map store
 func NewMapStore() *MapStore {
 	newData := make(map[int]*model.TodoData, 0)
@@ -36,6 +40,12 @@ func (ms *MapStore) CreateTodo(w http.ResponseWriter, r *http.Request) {
 	defer ms.m.Unlock()
 
 	title := r.FormValue("title")
+	if title == "" {
+		log.Println("form title is empty")
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
 	ms.key += 1
 
 	todo := &model.TodoData{
