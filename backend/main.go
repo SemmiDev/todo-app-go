@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/Xanvial/todo-app-go/backend/datastore"
 	"github.com/gorilla/handlers"
@@ -30,8 +31,20 @@ func NewServer(dataStoreType datastore.DataStoreType) *Server {
 	}
 }
 
+// ping is a function that returns a pong
 func ping(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "pong")
+}
+
+// initMiddlewares is a function that initializes the middlewares
+func (s *Server) initMiddlewares() {
+	// add logger middleware
+	s.router.Use(func(h http.Handler) http.Handler {
+		return handlers.LoggingHandler(os.Stdout, h)
+	})
+
+	// add logger middleware
+	s.router.Use(handlers.RecoveryHandler(handlers.PrintRecoveryStack(true)))
 }
 
 // initRoutes is a function that initializes the routes
@@ -77,7 +90,9 @@ func (s *Server) Run(addr string) {
 
 func main() {
 	// define the data store type & create the server
-	s := NewServer(datastore.PostgreDataStore)
+	s := NewServer(datastore.MapDataStore)
+	// init middlewares
+	s.initMiddlewares()
 	// init the routes
 	s.initRoutes()
 	// run the server on port 8080
