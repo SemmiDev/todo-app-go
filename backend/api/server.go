@@ -19,21 +19,15 @@ type Server struct {
 }
 
 // NewServer is a function that creates a new server
-func NewServer(
-	dataStoreType datastore.DataStoreType,
-	htmlData embed.FS) *Server {
-
-	server := &Server{
+func NewServer(dataStoreType datastore.DataStoreType, htmlData embed.FS) *Server {
+	s := &Server{
 		router:    mux.NewRouter(),
 		dataStore: datastore.New(dataStoreType),
 	}
+	s.setupMiddleware()
+	s.setupRouter(htmlData)
 
-	// setup the middlewares
-	server.setupMiddleware()
-	// setup the routers
-	server.setupRouter(htmlData)
-
-	return server
+	return s
 }
 
 // ping is a function that returns a pong
