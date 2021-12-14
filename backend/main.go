@@ -14,13 +14,7 @@ var htmlData embed.FS
 
 func main() {
 	// define the data store type & create the server
-	s := api.NewServer(
-		// use the map/arrary/db data store
-		datastore.PostgreDataStore,
-		// use the embedded html files
-		htmlData,
-	)
-
+	s := api.NewServer(datastore.Map, htmlData)
 	// run the server on port in config
 	s.Start(model.AppPort)
 }

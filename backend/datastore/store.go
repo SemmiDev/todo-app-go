@@ -6,30 +6,30 @@ import (
 )
 
 // DataStoreType is the type of the datastore
-type DataStoreType uint
+type Type uint
 
 // variants of DataStoreType
 const (
-	ArrayDataStore DataStoreType = iota + 1
-	MapDataStore
-	PostgreDataStore
+	Array Type = iota
+	Map
+	Postgre
 )
 
 // New creates a new datastore
-func New(storeType DataStoreType) DataStore {
+func New(datastore Type) DataStore {
 	// switch the storeType and return the appropriate datastore
-	switch storeType {
-	case ArrayDataStore:
-		log.Println("Currently Using Array Data Store")
+	switch datastore {
+	case Array:
+		log.Println("[Data Store] App Currently Using Array Data Store")
 		return NewArrayStore()
-	case MapDataStore:
-		log.Println("Currently Using Map Data Store")
+	case Map:
+		log.Println("[Data Store] App Currently Using Map Data Store")
 		return NewMapStore()
-	case PostgreDataStore:
-		log.Println("Currently Using Postgre SQL Data Store")
+	case Postgre:
+		log.Println("[Data Store] App Currently Using Postgre SQL Data Store")
 		return NewDBStore()
 	default:
-		log.Println("Currently Using Map Data Store")
+		log.Println("[Default] App Currently Using Map Data Store")
 		return NewMapStore()
 	}
 }

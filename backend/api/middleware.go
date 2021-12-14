@@ -7,14 +7,8 @@ import (
 	"github.com/gorilla/handlers"
 )
 
-// InitMiddlewares is a function that initializes the middlewares
-func (s *Server) setupMiddleware() {
-	s.loggingMiddleware()
-	s.recoveryMiddleware()
-}
-
-// initMiddlewares is a function that initializes the middlewares
-func (s *Server) loggingMiddleware() {
+// setupLoggingMiddleware is a function that initializes the loggin middleware
+func (s *Server) setupLoggingMiddleware() {
 	// add logger middleware
 	s.router.Use(func(h http.Handler) http.Handler {
 		return handlers.LoggingHandler(os.Stdout, h)
@@ -22,7 +16,7 @@ func (s *Server) loggingMiddleware() {
 }
 
 // recoveryMiddleware is a function that initializes the recovery middleware
-func (s *Server) recoveryMiddleware() {
+func (s *Server) setupRecoveryMiddleware() {
 	// add logger middleware
 	s.router.Use(handlers.RecoveryHandler(handlers.PrintRecoveryStack(true)))
 }

@@ -19,13 +19,18 @@ type Server struct {
 }
 
 // NewServer is a function that creates a new server
-func NewServer(dataStoreType datastore.DataStoreType, htmlData embed.FS) *Server {
+func NewServer(dataStoreType datastore.Type, htmlData embed.FS) *Server {
 	s := &Server{
 		router:    mux.NewRouter(),
 		dataStore: datastore.New(dataStoreType),
 	}
-	s.setupMiddleware()
-	s.setupRouter(htmlData)
+
+	// setup middlewares
+	s.setupLoggingMiddleware()
+	s.setupRecoveryMiddleware()
+
+	// setup routes
+	s.setupRoutes(htmlData)
 
 	return s
 }
@@ -36,7 +41,7 @@ func ping(w http.ResponseWriter, r *http.Request) {
 }
 
 // initRoutes is a function that initializes the routes
-func (s *Server) setupRouter(htmlData embed.FS) {
+func (s *Server) setupRoutes(htmlData embed.FS) {
 	// create the endpoint for the ping
 	s.router.HandleFunc("/ping", ping).Methods(http.MethodGet)
 	// get completed todo "/todo/completed"
