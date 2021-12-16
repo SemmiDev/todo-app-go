@@ -21,10 +21,8 @@ type ArrayStore struct {
 
 // NewArrayStore creates a new ArrayStore
 func NewArrayStore() *ArrayStore {
-	newData := make([]*model.TodoData, 0)
-
 	return &ArrayStore{
-		data: newData,
+		data: make([]*model.TodoData, 0),
 	}
 }
 
@@ -34,9 +32,9 @@ func (as *ArrayStore) GetCompleted(w http.ResponseWriter, r *http.Request) {
 	defer as.m.RUnlock()
 
 	completed := make([]*model.TodoData, 0)
-	for _, d := range as.data {
-		if d.Status {
-			completed = append(completed, copy(d))
+	for _, todo := range as.data {
+		if todo.Status {
+			completed = append(completed, todo.Clone())
 		}
 	}
 
@@ -51,9 +49,9 @@ func (as *ArrayStore) GetIncomplete(w http.ResponseWriter, r *http.Request) {
 
 	// get incomplete data
 	incomplete := make([]*model.TodoData, 0)
-	for _, d := range as.data {
-		if !d.Status {
-			incomplete = append(incomplete, copy(d))
+	for _, todo := range as.data {
+		if !todo.Status {
+			incomplete = append(incomplete, todo.Clone())
 		}
 	}
 

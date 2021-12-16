@@ -36,7 +36,8 @@ func TestMain(m *testing.M) {
 
 	// choose the datastore
 	// store := testPostgreStore
-	store := testMapStore
+	// store := testMapStore
+	store := testPostgreStore
 
 	// set up routes
 	app.HandleFunc("/todo/completed", store.GetCompleted).Methods(http.MethodGet)

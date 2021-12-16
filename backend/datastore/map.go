@@ -21,6 +21,7 @@ type MapStore struct {
 	data map[int]*model.TodoData
 }
 
+// SetKey for set key to zero (for testing)
 func (ms *MapStore) SetKey(i int) {
 	ms.key = 0
 }
@@ -55,7 +56,7 @@ func (ms *MapStore) CreateTodo(w http.ResponseWriter, r *http.Request) {
 	ms.data[ms.key] = todo
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(copy(todo))
+	json.NewEncoder(w).Encode(todo.Clone())
 }
 
 // GetCompleted get todos that are completed
@@ -66,7 +67,7 @@ func (ms *MapStore) GetCompleted(w http.ResponseWriter, r *http.Request) {
 	completed := []*model.TodoData{}
 	for _, todo := range ms.data {
 		if todo.Status {
-			completed = append(completed, copy(todo))
+			completed = append(completed, todo.Clone())
 		}
 	}
 
@@ -82,7 +83,7 @@ func (ms *MapStore) GetIncomplete(w http.ResponseWriter, r *http.Request) {
 	incompleted := []*model.TodoData{}
 	for _, todo := range ms.data {
 		if !todo.Status {
-			incompleted = append(incompleted, copy(todo))
+			incompleted = append(incompleted, todo.Clone())
 		}
 	}
 
@@ -130,13 +131,4 @@ func (ms *MapStore) DeleteTodo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	delete(ms.data, ID)
-}
-
-// copy creates a copy of the todo
-func copy(todo *model.TodoData) *model.TodoData {
-	return &model.TodoData{
-		ID:     todo.ID,
-		Title:  todo.Title,
-		Status: todo.Status,
-	}
 }
