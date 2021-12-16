@@ -27,10 +27,9 @@ func (ms *MapStore) SetKey(i int) {
 
 // NewMapStore creates a new map store
 func NewMapStore() *MapStore {
-	newData := make(map[int]*model.TodoData, 0)
 	return &MapStore{
 		key:  0,
-		data: newData,
+		data: make(map[int]*model.TodoData),
 	}
 }
 
