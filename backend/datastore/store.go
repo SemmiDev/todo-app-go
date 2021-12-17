@@ -3,6 +3,8 @@ package datastore
 import (
 	"log"
 	"net/http"
+
+	"github.com/Xanvial/todo-app-go/backend/util"
 )
 
 // DataStoreType is the type of the datastore
@@ -16,7 +18,7 @@ const (
 )
 
 // New creates a new datastore
-func New(datastore Type) DataStore {
+func New(config util.Config, datastore Type) DataStore {
 	// switch the storeType and return the appropriate datastore
 	switch datastore {
 	case Array:
@@ -27,7 +29,7 @@ func New(datastore Type) DataStore {
 		return NewMapStore()
 	case Postgre:
 		log.Println("[Data Store] App Currently Using Postgre SQL Data Store")
-		return NewDBStore()
+		return NewDBStore(config)
 	default:
 		log.Println("[Default] App Currently Using Map Data Store")
 		return NewMapStore()

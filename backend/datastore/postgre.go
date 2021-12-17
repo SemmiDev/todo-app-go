@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Xanvial/todo-app-go/backend/util"
 	"github.com/Xanvial/todo-app-go/model"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
@@ -24,9 +25,9 @@ func (ds *DBStore) GetDB() *sql.DB {
 }
 
 // NewDBStore creates a new DBStore
-func NewDBStore() *DBStore {
+func NewDBStore(config util.Config) *DBStore {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		model.DBHost, model.DBPort, model.DBUser, model.DBPassword, model.DBName)
+		config.DBHost, config.DBPort, config.DBUser, config.DBPassword, config.DBName)
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		log.Fatal(err)
