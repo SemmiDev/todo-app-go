@@ -8,31 +8,36 @@ import (
 	"net/http"
 
 	"github.com/Xanvial/todo-app-go/backend/datastore"
+	"github.com/Xanvial/todo-app-go/backend/util"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
 // Server is a struct that holds the server information
 type Server struct {
-	router    *mux.Router
+	config    util.Config
 	dataStore datastore.DataStore
+	router    *mux.Router
 }
 
 // NewServer is a function that creates a new server
-func NewServer(dataStoreType datastore.Type, htmlData embed.FS) *Server {
-	s := &Server{
-		router:    mux.NewRouter(),
-		dataStore: datastore.New(dataStoreType),
+func NewServer(
+	config util.Config,
+	htmlData embed.FS,
+	dataStoreType datastore.Type) *Server {
+
+	datastore := datastore.New(config, dataStoreType)
+	server := &Server{
+		config:    config,
+		dataStore: datastore,
 	}
 
-	// setup middlewares
-	s.setupLoggingMiddleware()
-	s.setupRecoveryMiddleware()
+	server.setupRouter(htmlData)
 
-	// setup routes
-	s.setupRoutes(htmlData)
+	server.setupLoggingMiddleware()
+	server.setupRecoveryMiddleware()
 
-	return s
+	return server
 }
 
 // ping is a function that returns a pong
@@ -41,19 +46,21 @@ func ping(w http.ResponseWriter, r *http.Request) {
 }
 
 // initRoutes is a function that initializes the routes
-func (s *Server) setupRoutes(htmlData embed.FS) {
+func (s *Server) setupRouter(htmlData embed.FS) {
+	router := mux.NewRouter()
+
 	// create the endpoint for the ping
-	s.router.HandleFunc("/ping", ping).Methods(http.MethodGet)
+	router.HandleFunc("/ping", ping).Methods(http.MethodGet)
 	// get completed todo "/todo/completed"
-	s.router.HandleFunc("/todo/completed", s.dataStore.GetCompleted).Methods(http.MethodGet)
+	router.HandleFunc("/todo/completed", s.dataStore.GetCompleted).Methods(http.MethodGet)
 	// get incomplete todo "/todo/incomplete"
-	s.router.HandleFunc("/todo/incomplete", s.dataStore.GetIncomplete).Methods(http.MethodGet)
+	router.HandleFunc("/todo/incomplete", s.dataStore.GetIncomplete).Methods(http.MethodGet)
 	// add todo
-	s.router.HandleFunc("/add", s.dataStore.CreateTodo).Methods(http.MethodPost)
+	router.HandleFunc("/add", s.dataStore.CreateTodo).Methods(http.MethodPost)
 	// update todo status
-	s.router.HandleFunc("/update/{id}", s.dataStore.UpdateTodo).Methods(http.MethodPut)
+	router.HandleFunc("/update/{id}", s.dataStore.UpdateTodo).Methods(http.MethodPut)
 	// delete todo
-	s.router.HandleFunc("/delete/{id}", s.dataStore.DeleteTodo).Methods(http.MethodDelete)
+	router.HandleFunc("/delete/{id}", s.dataStore.DeleteTodo).Methods(http.MethodDelete)
 
 	// server static resource last
 	// this assumes main.go is called from root project,
@@ -63,9 +70,11 @@ func (s *Server) setupRoutes(htmlData embed.FS) {
 		log.Fatal(err)
 	}
 
-	s.router.PathPrefix("/").Handler(http.FileServer(http.FS(serverRoot)))
+	router.PathPrefix("/").Handler(http.FileServer(http.FS(serverRoot)))
 	// if current go doesn't support embed, uncomment this and use instead of embedded implementation above
 	// router.PathPrefix("/").Handler(http.FileServer(http.Dir("webstatic")))
+
+	s.router = router
 }
 
 // Run is a function that runs the server
