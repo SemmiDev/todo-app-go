@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/Xanvial/todo-app-go/model"
+	"github.com/Xanvial/todo-app-go/backend/util"
 	"github.com/go-pg/migrations"
 	"github.com/go-pg/pg"
 )
@@ -28,13 +28,17 @@ func main() {
 	flag.Parse()
 
 	// read config
+	config, err := util.LoadConfig("..")
+	if err != nil {
+		log.Fatal("cannot load config:", err)
+	}
 
 	// should not do this on real application, save the configuration on separate config file
 	db := pg.Connect(&pg.Options{
-		Addr:     fmt.Sprintf("%s:%d", model.DBHost, model.DBPort),
-		Database: model.DBName,
-		User:     model.DBUser,
-		Password: model.DBPassword,
+		Addr:     fmt.Sprintf("%s:%d", config.DBHost, config.DBPort),
+		Database: config.DBName,
+		User:     config.DBUser,
+		Password: config.DBPassword,
 	})
 
 	oldVersion, newVersion, err := migrations.Run(db, flag.Args()...)
