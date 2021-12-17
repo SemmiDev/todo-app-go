@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -9,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/Xanvial/todo-app-go/backend/datastore"
+	"github.com/Xanvial/todo-app-go/backend/util"
 	"github.com/Xanvial/todo-app-go/model"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/require"
@@ -27,15 +29,17 @@ var testMapStore *datastore.MapStore
 
 // TestMain is the main function to be executed when running tests
 func TestMain(m *testing.M) {
-	// set up test database
+	// load config
+	config, err := util.LoadConfig("../..")
+	if err != nil {
+		log.Fatal("cannot load config:", err)
+	}
+	// create new router
 	app = mux.NewRouter()
-	// set up postgre store
-	testPostgreStore = datastore.NewDBStore()
-	// set up map store
+	testPostgreStore = datastore.NewDBStore(config)
 	testMapStore = datastore.NewMapStore()
 
 	// choose the datastore
-	// store := testPostgreStore
 	// store := testMapStore
 	store := testPostgreStore
 
