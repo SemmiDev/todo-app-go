@@ -1,14 +1,10 @@
 package datastore
 
 import (
-	"encoding/json"
-	"log"
-	"net/http"
-	"strconv"
+	"context"
 	"sync"
 
 	"github.com/Xanvial/todo-app-go/model"
-	"github.com/gorilla/mux"
 )
 
 // MapStore stores todos in map
@@ -34,33 +30,8 @@ func NewMapStore() *MapStore {
 	}
 }
 
-// CreateTodo saves the todo to the map store
-func (ms *MapStore) CreateTodo(w http.ResponseWriter, r *http.Request) {
-	ms.m.Lock()
-	defer ms.m.Unlock()
-
-	title := r.FormValue("title")
-	if title == "" {
-		log.Println("form title is empty")
-		http.Error(w, "Bad Request", http.StatusBadRequest)
-		return
-	}
-
-	ms.key += 1
-
-	todo := &model.TodoData{
-		ID:     ms.key,
-		Title:  title,
-		Status: false,
-	}
-	ms.data[ms.key] = todo
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(todo.Clone())
-}
-
 // GetCompleted get todos that are completed
-func (ms *MapStore) GetCompleted(w http.ResponseWriter, r *http.Request) {
+func (ms *MapStore) GetCompleted(ctx context.Context) ([]*model.TodoData, error) {
 	ms.m.RLock()
 	defer ms.m.RUnlock()
 
@@ -71,12 +42,11 @@ func (ms *MapStore) GetCompleted(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(completed)
+	return completed, nil
 }
 
 // GetIncomplete get todos that are incomplete
-func (ms *MapStore) GetIncomplete(w http.ResponseWriter, r *http.Request) {
+func (ms *MapStore) GetIncomplete(ctx context.Context) ([]*model.TodoData, error) {
 	ms.m.RLock()
 	defer ms.m.RUnlock()
 
@@ -87,48 +57,44 @@ func (ms *MapStore) GetIncomplete(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(incompleted)
+	return incompleted, nil
 }
 
-// UpdateTodo updates the todo with the given id
-func (ms *MapStore) UpdateTodo(w http.ResponseWriter, r *http.Request) {
+// CreateTodo saves the todo to the map store
+func (ms *MapStore) CreateTodo(ctx context.Context, title string) (*model.TodoData, error) {
 	ms.m.Lock()
 	defer ms.m.Unlock()
 
-	vars := mux.Vars(r)
-	ID, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		log.Println("error on deleting todo:", err)
-		http.Error(w, "Bad Request", http.StatusBadRequest)
-		return
-	}
+	ms.key += 1
 
-	status, err := strconv.ParseBool(r.FormValue("status"))
-	if err != nil {
-		log.Println("error on updating todo:", err)
-		http.Error(w, "Bad Request", http.StatusBadRequest)
-		return
+	todo := &model.TodoData{
+		ID:     ms.key,
+		Title:  title,
+		Status: false,
 	}
+	ms.data[ms.key] = todo
+
+	return todo.Clone(), nil
+}
+
+// UpdateTodo updates the todo with the given id
+func (ms *MapStore) UpdateTodo(ctx context.Context, ID int, status bool) error {
+	ms.m.Lock()
+	defer ms.m.Unlock()
 
 	for todoID, todo := range ms.data {
 		if todoID == ID {
 			todo.Status = status
 		}
 	}
+	return nil
 }
 
 // DeleteTodo deletes the todo with the given id
-func (ms *MapStore) DeleteTodo(w http.ResponseWriter, r *http.Request) {
+func (ms *MapStore) DeleteTodo(ctx context.Context, ID int) error {
 	ms.m.Lock()
 	defer ms.m.Unlock()
 
-	vars := mux.Vars(r)
-	ID, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		log.Println("error on deleting todo:", err)
-		http.Error(w, "Bad Request", http.StatusBadRequest)
-		return
-	}
 	delete(ms.data, ID)
+	return nil
 }
