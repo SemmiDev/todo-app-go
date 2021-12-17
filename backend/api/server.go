@@ -52,15 +52,15 @@ func (s *Server) setupRouter(htmlData embed.FS) {
 	// create the endpoint for the ping
 	router.HandleFunc("/ping", ping).Methods(http.MethodGet)
 	// get completed todo "/todo/completed"
-	router.HandleFunc("/todo/completed", s.dataStore.GetCompleted).Methods(http.MethodGet)
+	router.HandleFunc("/todo/completed", s.getCompleted).Methods(http.MethodGet)
 	// get incomplete todo "/todo/incomplete"
-	router.HandleFunc("/todo/incomplete", s.dataStore.GetIncomplete).Methods(http.MethodGet)
+	router.HandleFunc("/todo/incomplete", s.getIncomplete).Methods(http.MethodGet)
 	// add todo
-	router.HandleFunc("/add", s.dataStore.CreateTodo).Methods(http.MethodPost)
+	router.HandleFunc("/add", s.createTodo).Methods(http.MethodPost)
 	// update todo status
-	router.HandleFunc("/update/{id}", s.dataStore.UpdateTodo).Methods(http.MethodPut)
+	router.HandleFunc("/update/{id}", s.updateTodo).Methods(http.MethodPut)
 	// delete todo
-	router.HandleFunc("/delete/{id}", s.dataStore.DeleteTodo).Methods(http.MethodDelete)
+	router.HandleFunc("/delete/{id}", s.deleteTodo).Methods(http.MethodDelete)
 
 	// server static resource last
 	// this assumes main.go is called from root project,

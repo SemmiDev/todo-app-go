@@ -34,21 +34,25 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		log.Fatal("cannot load config:", err)
 	}
-	// create new router
+
 	app = mux.NewRouter()
+	server := Server{
+		dataStore: datastore.New(config, datastore.Postgre),
+		router:    app,
+	}
+
+	// create new router
 	testPostgreStore = datastore.NewDBStore(config)
 	testMapStore = datastore.NewMapStore()
 
-	// choose the datastore
-	// store := testMapStore
-	store := testPostgreStore
-
 	// set up routes
-	app.HandleFunc("/todo/completed", store.GetCompleted).Methods(http.MethodGet)
-	app.HandleFunc("/todo/incomplete", store.GetIncomplete).Methods(http.MethodGet)
-	app.HandleFunc("/add", store.CreateTodo).Methods(http.MethodPost)
-	app.HandleFunc("/update/{id}", store.UpdateTodo).Methods(http.MethodPut)
-	app.HandleFunc("/delete/{id}", store.DeleteTodo).Methods(http.MethodDelete)
+	app.HandleFunc("/todo/completed", server.getCompleted).Methods(http.MethodGet)
+	app.HandleFunc("/todo/incomplete", server.getIncomplete).Methods(http.MethodGet)
+	app.HandleFunc("/add", server.createTodo).Methods(http.MethodPost)
+	app.HandleFunc("/update/{id}", server.updateTodo).Methods(http.MethodPut)
+	app.HandleFunc("/delete/{id}", server.deleteTodo).Methods(http.MethodDelete)
+
+	app = server.router
 
 	// run tests
 	os.Exit(m.Run())
