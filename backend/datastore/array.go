@@ -1,20 +1,18 @@
 package datastore
 
 import (
-	"encoding/json"
-	"log"
-	"net/http"
-	"strconv"
+	"context"
 	"sync"
 
 	"github.com/Xanvial/todo-app-go/model"
-	"github.com/gorilla/mux"
 )
 
 // ArrayStore is a datastore that stores data in slice
 type ArrayStore struct {
 	// m is a mutex to ensure thread safety
 	m sync.RWMutex
+	// key always increment when creating new todo
+	key int
 	// data is a slice of todo data
 	data []*model.TodoData
 }
@@ -27,7 +25,7 @@ func NewArrayStore() *ArrayStore {
 }
 
 // GetCompleted returns completed data
-func (as *ArrayStore) GetCompleted(w http.ResponseWriter, r *http.Request) {
+func (as *ArrayStore) GetCompleted(ctx context.Context) ([]*model.TodoData, error) {
 	as.m.RLock()
 	defer as.m.RUnlock()
 
@@ -38,12 +36,11 @@ func (as *ArrayStore) GetCompleted(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(completed)
+	return completed, nil
 }
 
 // GetIncomplete returns incomplete data
-func (as *ArrayStore) GetIncomplete(w http.ResponseWriter, r *http.Request) {
+func (as *ArrayStore) GetIncomplete(ctx context.Context) ([]*model.TodoData, error) {
 	as.m.RLock()
 	defer as.m.RUnlock()
 
@@ -55,54 +52,50 @@ func (as *ArrayStore) GetIncomplete(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(incomplete)
+	return incomplete, nil
 }
 
 // CreateTodo creates a new todo
-func (as *ArrayStore) CreateTodo(w http.ResponseWriter, r *http.Request) {
+func (as *ArrayStore) CreateTodo(ctx context.Context, title string) (*model.TodoData, error) {
 	as.m.Lock()
 	defer as.m.Unlock()
 
-	title := r.FormValue("title")
-	if title == "" {
-		log.Println("form title is empty")
-		http.Error(w, "Bad Request", http.StatusBadRequest)
-		return
-	}
+	as.key += 1
 
-	as.data = append(as.data, &model.TodoData{
-		Title: title,
-	})
+	todo := &model.TodoData{
+		ID:     as.key,
+		Title:  title,
+		Status: false,
+	}
+	as.data = append(as.data, todo)
+
+	return todo.Clone(), nil
 }
 
 // UpdateTodo updates a todo
-func (as *ArrayStore) UpdateTodo(w http.ResponseWriter, r *http.Request) {
+func (as *ArrayStore) UpdateTodo(ctx context.Context, ID int, status bool) error {
 	as.m.Lock()
 	defer as.m.Unlock()
 
-	vars := mux.Vars(r)
-	title := vars["title"]
-	status, _ := strconv.ParseBool(r.FormValue("status"))
-
 	for idx, d := range as.data {
-		if d.Title == title {
+		if d.ID == ID {
 			as.data[idx].Status = status
 		}
 	}
+
+	return nil
 }
 
 // DeleteTodo deletes a todo
-func (as *ArrayStore) DeleteTodo(w http.ResponseWriter, r *http.Request) {
+func (as *ArrayStore) DeleteTodo(ctx context.Context, ID int) error {
 	as.m.Lock()
 	defer as.m.Unlock()
 
-	vars := mux.Vars(r)
-	title := vars["title"]
-
 	for idx, d := range as.data {
-		if d.Title == title {
+		if d.ID == ID {
 			as.data = append(as.data[:idx], as.data[idx+1:]...)
 		}
 	}
+
+	return nil
 }
