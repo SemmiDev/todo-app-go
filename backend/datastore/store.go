@@ -1,10 +1,11 @@
 package datastore
 
 import (
+	"context"
 	"log"
-	"net/http"
 
 	"github.com/Xanvial/todo-app-go/backend/util"
+	"github.com/Xanvial/todo-app-go/model"
 )
 
 // DataStoreType is the type of the datastore
@@ -38,9 +39,9 @@ func New(config util.Config, datastore Type) DataStore {
 
 // Datastore is the interface that wraps the basic Get, Put and Delete methods.
 type DataStore interface {
-	GetCompleted(w http.ResponseWriter, r *http.Request)
-	GetIncomplete(w http.ResponseWriter, r *http.Request)
-	CreateTodo(w http.ResponseWriter, r *http.Request)
-	UpdateTodo(w http.ResponseWriter, r *http.Request)
-	DeleteTodo(w http.ResponseWriter, r *http.Request)
+	GetCompleted(ctx context.Context) ([]*model.TodoData, error)
+	GetIncomplete(ctx context.Context) ([]*model.TodoData, error)
+	CreateTodo(ctx context.Context, title string) (*model.TodoData, error)
+	UpdateTodo(ctx context.Context, ID int, status bool) error
+	DeleteTodo(ctx context.Context, ID int) error
 }
