@@ -46,6 +46,15 @@ func NewDBStore(config util.Config) *DBStore {
 	}
 }
 
+func (ds *DBStore) truncateTable() {
+	query := `TRUNCATE TABLE todo`
+
+	_, err := ds.db.Exec(query)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 // GetCompleted returns all completed todos
 func (ds *DBStore) GetCompleted(ctx context.Context) ([]*model.TodoData, error) {
 	var completed []*model.TodoData
