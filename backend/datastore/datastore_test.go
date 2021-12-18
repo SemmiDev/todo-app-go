@@ -64,6 +64,16 @@ func TestGetIncomplete(t *testing.T) {
 	require.Equal(t, todo1.Title, todo2[0].Title)
 
 	dbStoreTest.truncateTable()
+
+	n := 10
+	for i := 1; i <= n; i++ {
+		_ = createRandomTodo(t)
+	}
+	todo2, err = dbStoreTest.GetIncomplete(ctx)
+	require.NoError(t, err)
+	require.NotNil(t, todo2)
+	require.Equal(t, n, len(todo2))
+	dbStoreTest.truncateTable()
 }
 
 func TestGetCompleted(t *testing.T) {
