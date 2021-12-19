@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"context"
+	"log"
 	"sync"
 
 	"github.com/Xanvial/todo-app-go/model"
@@ -24,6 +25,7 @@ func (ms *MapStore) SetKey(i int) {
 
 // NewMapStore creates a new map store
 func NewMapStore() *MapStore {
+	log.Println("[Data Store] App Currently Using Map Data Store")
 	return &MapStore{
 		key:  0,
 		data: make(map[int]*model.TodoData),

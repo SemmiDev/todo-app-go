@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"context"
+	"log"
 	"sync"
 
 	"github.com/Xanvial/todo-app-go/model"
@@ -19,6 +20,7 @@ type ArrayStore struct {
 
 // NewArrayStore creates a new ArrayStore
 func NewArrayStore() *ArrayStore {
+	log.Println("[Data Store] App Currently Using Array Data Store")
 	return &ArrayStore{
 		data: make([]*model.TodoData, 0),
 	}

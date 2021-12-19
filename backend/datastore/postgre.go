@@ -41,6 +41,7 @@ func NewDBStore(config util.Config) *DBStore {
 	db.SetMaxOpenConns(20)
 	db.SetMaxIdleConns(10)
 
+	log.Println("[Data Store] App Currently Using Postgre SQL Data Store")
 	return &DBStore{
 		db: db,
 	}
