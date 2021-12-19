@@ -28,3 +28,6 @@ docker-start:
 
 docker-stop:
 	@docker-compose down
+
+mock:
+	@mockgen -destination backend/datastore/mock/datastore.go github.com/Xanvial/todo-app-go/backend/datastore DataStore
