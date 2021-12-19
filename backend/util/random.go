@@ -12,6 +12,11 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
+// RandomInt generates a random integer between min and max
+func RandomInt(min, max int) int {
+	return min + rand.Intn(max-min+1)
+}
+
 // RandomString generates a random string of length n
 func RandomString(n int) string {
 	var sb strings.Builder
