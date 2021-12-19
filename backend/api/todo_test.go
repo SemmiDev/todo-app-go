@@ -33,14 +33,19 @@ func requireBodyMatchTodo(t *testing.T, body *bytes.Buffer, todo *model.TodoData
 	require.Equal(t, todo.Status, gotTodo.Status)
 }
 
-func requireBodyMatchTodos(t *testing.T, body *bytes.Buffer) int {
+func requireBodyMatchTodos(t *testing.T, body *bytes.Buffer, todos []*model.TodoData) {
 	data, err := ioutil.ReadAll(body)
 	require.NoError(t, err)
 
-	var todos []*model.TodoData
-	err = json.Unmarshal(data, &todos)
+	var gotTodos []*model.TodoData
+	err = json.Unmarshal(data, &gotTodos)
 
-	return len(todos)
+	require.NoError(t, err)
+	require.Equal(t, len(todos), len(gotTodos))
+
+	for i, v := range gotTodos {
+		require.Equal(t, todos[i], v)
+	}
 }
 
 func TestCreateTodoAPI(t *testing.T) {
@@ -48,14 +53,14 @@ func TestCreateTodoAPI(t *testing.T) {
 	testCases := []struct {
 		name          string
 		title         string
-		FormValue     string
+		formValue     string
 		buildStubs    func(store *mockdb.MockDataStore)
 		checkResponse func(recoder *httptest.ResponseRecorder)
 	}{
 		{
 			name:      "Create a todo successfully",
 			title:     todo.Title,
-			FormValue: "title",
+			formValue: "title",
 			buildStubs: func(store *mockdb.MockDataStore) {
 				store.EXPECT().
 					CreateTodo(gomock.Any(), gomock.Eq(todo.Title)).
@@ -69,7 +74,7 @@ func TestCreateTodoAPI(t *testing.T) {
 		{
 			name:      "create a todo failed bad request",
 			title:     todo.Title,
-			FormValue: "xxx",
+			formValue: "xxx",
 			buildStubs: func(store *mockdb.MockDataStore) {
 				// skip because we don't expect any call to the store
 			},
@@ -81,7 +86,7 @@ func TestCreateTodoAPI(t *testing.T) {
 		{
 			name:      "create a todo failed internal server error",
 			title:     todo.Title,
-			FormValue: "title",
+			formValue: "title",
 			buildStubs: func(store *mockdb.MockDataStore) {
 				store.EXPECT().
 					CreateTodo(gomock.Any(), gomock.Eq(todo.Title)).
@@ -107,7 +112,7 @@ func TestCreateTodoAPI(t *testing.T) {
 			api := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
-			formValue := fmt.Sprintf("%s=%s", tc.FormValue, tc.title)
+			formValue := fmt.Sprintf("%s=%s", tc.formValue, tc.title)
 			req, err := http.NewRequest(http.MethodPost, "/add", strings.NewReader(formValue))
 			require.NoError(t, err)
 			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -118,9 +123,8 @@ func TestCreateTodoAPI(t *testing.T) {
 	}
 }
 
-func TestGetCompleteTodoAPI(t *testing.T) {
-	todos := randomTodos(t)
-	completedTodos, _ := filterTodos(t, todos)
+func TestGetCompletedTodoAPI(t *testing.T) {
+	completedTodos, _ := filterTodos(t, randomTodos(t))
 
 	testCases := []struct {
 		name          string
@@ -136,8 +140,7 @@ func TestGetCompleteTodoAPI(t *testing.T) {
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
-				lenght := requireBodyMatchTodos(t, recorder.Body)
-				require.Equal(t, lenght, len(completedTodos))
+				requireBodyMatchTodos(t, recorder.Body, completedTodos)
 			},
 		},
 	}
@@ -165,8 +168,7 @@ func TestGetCompleteTodoAPI(t *testing.T) {
 }
 
 func TestGetIncompleteTodoAPI(t *testing.T) {
-	todos := randomTodos(t)
-	_, incompleteTodos := filterTodos(t, todos)
+	_, incompleteTodos := filterTodos(t, randomTodos(t))
 
 	testCases := []struct {
 		name          string
@@ -182,8 +184,7 @@ func TestGetIncompleteTodoAPI(t *testing.T) {
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
-				lenght := requireBodyMatchTodos(t, recorder.Body)
-				require.Equal(t, lenght, len(incompleteTodos))
+				requireBodyMatchTodos(t, recorder.Body, incompleteTodos)
 			},
 		},
 	}
