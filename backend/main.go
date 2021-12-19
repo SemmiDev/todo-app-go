@@ -13,11 +13,18 @@ import (
 var htmlData embed.FS
 
 func main() {
+	// load the configuration
 	config, err := util.LoadConfig("..")
 	if err != nil {
 		log.Fatal("cannot load config:", err)
 	}
 
-	server := api.NewServer(config, htmlData, datastore.Postgre)
+	// setup the datastore
+	dataStore := datastore.NewDBStore(config)
+
+	// setup the server
+	server := api.NewServer(config, htmlData, dataStore)
+
+	// start the server
 	server.Start(config.AppPort)
 }
