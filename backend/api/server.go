@@ -23,16 +23,15 @@ type Server struct {
 // NewServer is a function that creates a new server
 func NewServer(
 	config util.Config,
-	htmlData embed.FS,
-	dataStoreType datastore.Type) *Server {
+	static embed.FS,
+	dataStore datastore.DataStore) *Server {
 
-	datastore := datastore.New(config, dataStoreType)
 	server := &Server{
 		config:    config,
-		dataStore: datastore,
+		dataStore: dataStore,
 	}
 
-	server.setupRouter(htmlData)
+	server.setupRouter(static)
 
 	server.setupLoggingMiddleware()
 	server.setupRecoveryMiddleware()
