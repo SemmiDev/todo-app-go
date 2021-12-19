@@ -29,3 +29,8 @@ func RandomString(n int) string {
 
 	return sb.String()
 }
+
+// RandomBool generates a random bool
+func RandomBool() bool {
+	return rand.Intn(2) == 1
+}
