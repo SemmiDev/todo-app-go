@@ -3,18 +3,21 @@ run:
 	@go build -v -o bin/todoapp backend/main.go
 	@./bin/todoapp
 
+run-exe:
+	@go build -v -o bin/todoapp.exe backend/main.go
+	@./bin/todoapp.exe
+
 build:
 	@go build -v -o bin/todoapp backend/main.go
 
 build-exe:
 	@go build -v -o bin/todoapp.exe backend/main.go
 
-run-exe:
-	@go build -v -o bin/todoapp.exe backend/main.go
-	@./bin/todoapp.exe
-
 api-test:
 	@go test -v ./backend/api
+	
+store-test:
+	@go test -v ./backend/datastore
 
 db-init:
 	@go run migration/main.go init
