@@ -7,6 +7,8 @@
 - Calling one of above will generate executable file in `bin/` folder, that can be used to start the application
 - After app binary is running, the web can be opened in [http://localhost:8080/](http://localhost:8080/)
 
+# Demo
+![demo](https://github.com/SemmiDev/todo-app-go/blob/main/.github/assets/demo.gif)
 ## Project Structure
 ```
 │   .gitignore
