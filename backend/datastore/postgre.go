@@ -35,8 +35,6 @@ func NewDBStore(config util.Config) *DBStore {
 		log.Fatal(err)
 	}
 
-	log.Println("[DB] Successfully connected!")
-
 	// setup the connection pool
 	db.SetMaxOpenConns(20)
 	db.SetMaxIdleConns(10)
