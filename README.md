@@ -1,4 +1,4 @@
-# todo-app-go
+# Todo App Go
 [![tests](https://github.com/SemmiDev/todo-app-go/actions/workflows/test.yml/badge.svg)](https://github.com/SemmiDev/todo-app-go/actions/workflows/test.yml)
 
 - Make sure to run `go mod tidy` first to download all needed libraries
