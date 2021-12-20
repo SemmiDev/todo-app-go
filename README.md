@@ -1,24 +1,76 @@
 # todo-app-go
+[![tests](https://github.com/SemmiDev/todo-app-go/actions/workflows/test.yml/badge.svg)](https://github.com/SemmiDev/todo-app-go/actions/workflows/test.yml)
 
-Make sure to run `go mod vendor` first to download all needed libraries
+- Make sure to run `go mod tidy` first to download all needed libraries
+- To run this application, call `make run` on root
+- To build only, call `make build` on root
+- Calling one of above will generate executable file in `bin/` folder, that can be used to start the application
+- After app binary is running, the web can be opened in [http://localhost:8080/](http://localhost:8080/)
 
-To run this application, call `make run` on root
-To build only, call `make build` on root
-Calling one of above will generate executable file in `bin/` folder, that can be used to start the application
-
-After app binary is running, the web can be opened in http://localhost:8080/
-
+## Project Structure
 ```
-bin                         # Binary output folder
-backend
- ├── datastore              # Main datastore implementation code, add necessary implementation here
- |    └──  interface.go     # Contains interface struct with all function that needs to be implemented
- ├── webstatic              # Frontend Codes, taken from https://github.com/themaxsandelin/todo
- └── main.go                # Main program of the app
-migration                   # DB Migration data folder, contains up/down sql queries
- └── main.go                # Script to trigger sql queries
-model
- └── model.go               # Data model of main object
+│   .gitignore
+│   app.env
+│   docker-compose.yaml
+│   go.mod
+│   go.sum
+│   LICENSE
+│   makefile
+│   README.md
+│   req.http
+│
+├───.github
+│   └───workflows
+│           test.yml
+│
+├───backend
+│   │   main.go                             # Main program of the app
+│   │
+│   ├───api
+│   │       main_test.go
+│   │       middleware.go
+│   │       server.go
+│   │       todo.go
+│   │       todo_test.go
+│   │
+│   ├───datastore
+│   │   │   array.go
+│   │   │   datastore_test.go
+│   │   │   map.go
+│   │   │   postgre.go
+│   │   │   store.go
+│   │   │
+│   │   └───mock
+│   │           datastore.go
+│   │
+│   ├───util
+│   │       config.go
+│   │       random.go
+│   │
+│   └───webstatic                           # Frontend Codes, taken from https://github.com/themaxsandelin/todo
+│       │   favicon.ico
+│       │   index.html
+│       │
+│       └───resources
+│           ├───css
+│           │       reset.min.css
+│           │       style.css
+│           │
+│           └───js
+│                   jquery-3.6.0.min.js
+│                   main.js
+│
+├───bin                                     # Binary output folder
+│       todoapp
+|       todoapp.exe
+│
+├───migration                               # DB Migration data folder, contains up/down sql queries
+│       1_create_main_table.down.sql
+│       1_create_main_table.up.sql
+│       main.go                             # Script to trigger sql queries
+│
+└───model                                  
+        todo.go                             # Data model of main object
 ```
 
 ## Database using Docker
