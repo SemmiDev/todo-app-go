@@ -48,4 +48,6 @@ jobs:
       run: make migrateup
 
     - name: Test
-      run: make test
+      run: |
+        make api_test
+        make store_test
