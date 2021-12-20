@@ -15,13 +15,16 @@ build-exe:
 
 api-test:
 	@go test -v ./backend/api
-	
+
 store-test:
 	@go test -v ./backend/datastore
 
 db-init:
 	@go run migration/main.go init
 	@go run migration/main.go up
+
+migrateup:
+	migrate -path migration -database "postgresql://toped:toped@localhost:5432/todo-db?sslmode=disable" -verbose up
 
 db-up:
 	@go run migration/main.go up
