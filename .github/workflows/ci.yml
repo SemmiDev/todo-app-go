@@ -49,5 +49,5 @@ jobs:
 
     - name: Test
       run: |
-        make api_test
-        make store_test
+        make api-test
+        make store-test
