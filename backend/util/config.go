@@ -1,7 +1,10 @@
 package util
 
 import (
-	"github.com/spf13/viper"
+	"os"
+	"strconv"
+
+	_ "github.com/spf13/viper"
 )
 
 // Config stores all configuration of the application.
@@ -17,16 +20,27 @@ type Config struct {
 
 // LoadConfig reads configuration from file or environment variables.
 func LoadConfig(path string) (config Config, err error) {
-	viper.AddConfigPath(path)
-	viper.SetConfigName("app")
-	viper.SetConfigType("env")
+	// viper.AddConfigPath(path)
+	// viper.SetConfigName("app")
+	// viper.SetConfigType("env")
 
-	viper.AutomaticEnv()
-	err = viper.ReadInConfig()
-	if err != nil {
-		return
+	// viper.AutomaticEnv()
+	// err = viper.ReadInConfig()
+	// if err != nil {
+	// 	return
+	// }
+
+	// err = viper.Unmarshal(&config)
+	// return
+
+	DBPort, _ := strconv.Atoi(os.Getenv("DB_PORT"))
+	config = Config{
+		AppPort:    os.Getenv("APP_PORT"),
+		DBHost:     os.Getenv("DB_HOST"),
+		DBPort:     DBPort,
+		DBUser:     os.Getenv("DB_USER"),
+		DBPassword: os.Getenv("DB_PASSWORD"),
+		DBName:     os.Getenv("DB_NAME"),
 	}
-
-	err = viper.Unmarshal(&config)
-	return
+	return config, nil
 }
