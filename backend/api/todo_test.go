@@ -67,7 +67,7 @@ func TestCreateTodoAPI(t *testing.T) {
 					Return(todo, nil)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusCreated, recorder.Code)
+				require.Equal(t, http.StatusOK, recorder.Code)
 				requireBodyMatchTodo(t, recorder.Body, todo)
 			},
 		},
