@@ -13,10 +13,8 @@ build:
 build-exe:
 	@go build -v -o bin/todoapp.exe backend/main.go
 
-api-test:
+test:
 	@go test -v ./backend/api
-
-store-test:
 	@go test -v ./backend/datastore
 
 db-init:

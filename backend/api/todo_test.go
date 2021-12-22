@@ -49,7 +49,7 @@ func requireBodyMatchTodos(t *testing.T, body *bytes.Buffer, todos []*entity.Tod
 }
 
 func TestCreateTodoAPI(t *testing.T) {
-	todo := randomTodo(t, true)
+	todo := randomTodo(true)
 	testCases := []struct {
 		name          string
 		title         string
@@ -90,7 +90,7 @@ func TestCreateTodoAPI(t *testing.T) {
 			buildStubs: func(store *mockdb.MockDataStore) {
 				store.EXPECT().
 					CreateTodo(gomock.Any(), gomock.Eq(todo.Title)).
-					Return(nil, errors.New("internal server errror"))
+					Return(nil, errors.New("internal server error"))
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
@@ -124,7 +124,7 @@ func TestCreateTodoAPI(t *testing.T) {
 }
 
 func TestGetCompletedTodoAPI(t *testing.T) {
-	completedTodos, _ := filterTodos(t, randomTodos(t))
+	completedTodos, _ := generateAndFilterTodos()
 
 	testCases := []struct {
 		name          string
@@ -168,7 +168,7 @@ func TestGetCompletedTodoAPI(t *testing.T) {
 }
 
 func TestGetIncompleteTodoAPI(t *testing.T) {
-	_, incompleteTodos := filterTodos(t, randomTodos(t))
+	_, incompleteTodos := generateAndFilterTodos()
 
 	testCases := []struct {
 		name          string
@@ -212,7 +212,7 @@ func TestGetIncompleteTodoAPI(t *testing.T) {
 }
 
 func TestDeleteTodoAPI(t *testing.T) {
-	todo := randomTodo(t, true)
+	todo := randomTodo(true)
 
 	testCases := []struct {
 		name          string
@@ -262,7 +262,7 @@ func TestDeleteTodoAPI(t *testing.T) {
 }
 
 func TestUpdateTodoAPI(t *testing.T) {
-	todo := randomTodo(t, true)
+	todo := randomTodo(true)
 
 	testCases := []struct {
 		name          string
@@ -317,7 +317,7 @@ func TestUpdateTodoAPI(t *testing.T) {
 	}
 }
 
-func randomTodo(t *testing.T, status bool) *entity.TodoData {
+func randomTodo(status bool) *entity.TodoData {
 	todo := entity.TodoData{
 		ID:     util.RandomInt(1, 10),
 		Title:  util.RandomString(10),
@@ -327,7 +327,7 @@ func randomTodo(t *testing.T, status bool) *entity.TodoData {
 	return &todo
 }
 
-func randomTodos(t *testing.T) []*entity.TodoData {
+func randomTodos() []*entity.TodoData {
 	todos := make([]*entity.TodoData, 0)
 	for i := 1; i <= 10; i++ {
 		todos = append(todos, &entity.TodoData{
@@ -340,7 +340,8 @@ func randomTodos(t *testing.T) []*entity.TodoData {
 	return todos
 }
 
-func filterTodos(t *testing.T, todos []*entity.TodoData) (completed []*entity.TodoData, incomplete []*entity.TodoData) {
+func generateAndFilterTodos() (completed []*entity.TodoData, incomplete []*entity.TodoData) {
+	todos := randomTodos()
 	for _, todo := range todos {
 		if todo.Status {
 			completed = append(completed, todo)
