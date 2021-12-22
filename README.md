@@ -12,12 +12,8 @@ Handler -> Data Store
 
 # Demo
 ![demo](https://github.com/SemmiDev/todo-app-go/blob/main/.github/assets/demo.gif)
-## Project Structure
+## Folder Structure
 ```
-│   app.env 
-│   docker-compose.yaml
-│   http.http
-│   makefile
 ├───bin                                     # Binary output folder
 ├───backend
 │   ├───api                                 
