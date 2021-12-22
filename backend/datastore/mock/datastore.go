@@ -6,7 +6,7 @@ package mock_datastore
 
 import (
 	context "context"
-	model "github.com/Xanvial/todo-app-go/model"
+	entity "github.com/Xanvial/todo-app-go/backend/entity"
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 )
@@ -35,10 +35,10 @@ func (m *MockDataStore) EXPECT() *MockDataStoreMockRecorder {
 }
 
 // CreateTodo mocks base method
-func (m *MockDataStore) CreateTodo(arg0 context.Context, arg1 string) (*model.TodoData, error) {
+func (m *MockDataStore) CreateTodo(arg0 context.Context, arg1 string) (*entity.TodoData, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateTodo", arg0, arg1)
-	ret0, _ := ret[0].(*model.TodoData)
+	ret0, _ := ret[0].(*entity.TodoData)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -64,10 +64,10 @@ func (mr *MockDataStoreMockRecorder) DeleteTodo(arg0, arg1 interface{}) *gomock.
 }
 
 // GetCompleted mocks base method
-func (m *MockDataStore) GetCompleted(arg0 context.Context) ([]*model.TodoData, error) {
+func (m *MockDataStore) GetCompleted(arg0 context.Context) ([]*entity.TodoData, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCompleted", arg0)
-	ret0, _ := ret[0].([]*model.TodoData)
+	ret0, _ := ret[0].([]*entity.TodoData)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -79,10 +79,10 @@ func (mr *MockDataStoreMockRecorder) GetCompleted(arg0 interface{}) *gomock.Call
 }
 
 // GetIncomplete mocks base method
-func (m *MockDataStore) GetIncomplete(arg0 context.Context) ([]*model.TodoData, error) {
+func (m *MockDataStore) GetIncomplete(arg0 context.Context) ([]*entity.TodoData, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetIncomplete", arg0)
-	ret0, _ := ret[0].([]*model.TodoData)
+	ret0, _ := ret[0].([]*entity.TodoData)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

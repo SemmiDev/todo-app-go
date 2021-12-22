@@ -5,7 +5,7 @@ import (
 	"log"
 	"sync"
 
-	"github.com/Xanvial/todo-app-go/model"
+	"github.com/Xanvial/todo-app-go/backend/entity"
 )
 
 // ArrayStore is a datastore that stores data in slice
@@ -15,23 +15,23 @@ type ArrayStore struct {
 	// key always increment when creating new todo
 	key int
 	// data is a slice of todo data
-	data []*model.TodoData
+	data []*entity.TodoData
 }
 
 // NewArrayStore creates a new ArrayStore
 func NewArrayStore() *ArrayStore {
 	log.Println("[Data Store] App Currently Using Array Data Store")
 	return &ArrayStore{
-		data: make([]*model.TodoData, 0),
+		data: make([]*entity.TodoData, 0),
 	}
 }
 
 // GetCompleted returns completed data
-func (as *ArrayStore) GetCompleted(ctx context.Context) ([]*model.TodoData, error) {
+func (as *ArrayStore) GetCompleted(ctx context.Context) ([]*entity.TodoData, error) {
 	as.m.RLock()
 	defer as.m.RUnlock()
 
-	completed := make([]*model.TodoData, 0)
+	completed := make([]*entity.TodoData, 0)
 	for _, todo := range as.data {
 		if todo.Status {
 			completed = append(completed, todo.Clone())
@@ -42,12 +42,12 @@ func (as *ArrayStore) GetCompleted(ctx context.Context) ([]*model.TodoData, erro
 }
 
 // GetIncomplete returns incomplete data
-func (as *ArrayStore) GetIncomplete(ctx context.Context) ([]*model.TodoData, error) {
+func (as *ArrayStore) GetIncomplete(ctx context.Context) ([]*entity.TodoData, error) {
 	as.m.RLock()
 	defer as.m.RUnlock()
 
 	// get incomplete data
-	incomplete := make([]*model.TodoData, 0)
+	incomplete := make([]*entity.TodoData, 0)
 	for _, todo := range as.data {
 		if !todo.Status {
 			incomplete = append(incomplete, todo.Clone())
@@ -58,13 +58,13 @@ func (as *ArrayStore) GetIncomplete(ctx context.Context) ([]*model.TodoData, err
 }
 
 // CreateTodo creates a new todo
-func (as *ArrayStore) CreateTodo(ctx context.Context, title string) (*model.TodoData, error) {
+func (as *ArrayStore) CreateTodo(ctx context.Context, title string) (*entity.TodoData, error) {
 	as.m.Lock()
 	defer as.m.Unlock()
 
 	as.key += 1
 
-	todo := &model.TodoData{
+	todo := &entity.TodoData{
 		ID:     as.key,
 		Title:  title,
 		Status: false,

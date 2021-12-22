@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/Xanvial/todo-app-go/backend/entity"
 	"github.com/Xanvial/todo-app-go/backend/util"
-	"github.com/Xanvial/todo-app-go/model"
 	_ "github.com/lib/pq"
 )
 
@@ -55,8 +55,8 @@ func (ds *DBStore) truncateTable() {
 }
 
 // GetCompleted returns all completed todos
-func (ds *DBStore) GetCompleted(ctx context.Context) ([]*model.TodoData, error) {
-	var completed []*model.TodoData
+func (ds *DBStore) GetCompleted(ctx context.Context) ([]*entity.TodoData, error) {
+	var completed []*entity.TodoData
 
 	query := `
 		SELECT id, title, status
@@ -71,7 +71,7 @@ func (ds *DBStore) GetCompleted(ctx context.Context) ([]*model.TodoData, error) 
 	defer rows.Close()
 
 	for rows.Next() {
-		var data model.TodoData
+		var data entity.TodoData
 		if err := rows.Scan(&data.ID, &data.Title, &data.Status); err != nil {
 			return nil, err
 		}
@@ -82,8 +82,8 @@ func (ds *DBStore) GetCompleted(ctx context.Context) ([]*model.TodoData, error) 
 }
 
 // GetIncomplete returns all incomplete todos
-func (ds *DBStore) GetIncomplete(ctx context.Context) ([]*model.TodoData, error) {
-	var incomplete []*model.TodoData
+func (ds *DBStore) GetIncomplete(ctx context.Context) ([]*entity.TodoData, error) {
+	var incomplete []*entity.TodoData
 
 	query := `
 		SELECT id, title, status
@@ -98,7 +98,7 @@ func (ds *DBStore) GetIncomplete(ctx context.Context) ([]*model.TodoData, error)
 	defer rows.Close()
 
 	for rows.Next() {
-		var data model.TodoData
+		var data entity.TodoData
 		if err := rows.Scan(&data.ID, &data.Title, &data.Status); err != nil {
 			return nil, err
 		}
@@ -109,7 +109,7 @@ func (ds *DBStore) GetIncomplete(ctx context.Context) ([]*model.TodoData, error)
 }
 
 // CreateTodo creates a new todo with the given title
-func (ds *DBStore) CreateTodo(ctx context.Context, title string) (*model.TodoData, error) {
+func (ds *DBStore) CreateTodo(ctx context.Context, title string) (*entity.TodoData, error) {
 	query := `
 		INSERT INTO todo (title) 
 		VALUES ($1) 
@@ -117,7 +117,7 @@ func (ds *DBStore) CreateTodo(ctx context.Context, title string) (*model.TodoDat
 	`
 
 	row := ds.db.QueryRowContext(ctx, query, title)
-	var todo model.TodoData
+	var todo entity.TodoData
 	if err := row.Scan(
 		&todo.ID,
 		&todo.Title,

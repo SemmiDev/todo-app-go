@@ -5,7 +5,7 @@ import (
 	"log"
 	"sync"
 
-	"github.com/Xanvial/todo-app-go/model"
+	"github.com/Xanvial/todo-app-go/backend/entity"
 )
 
 // MapStore stores todos in map
@@ -14,8 +14,8 @@ type MapStore struct {
 	m sync.RWMutex
 	// key always increment when creating new todo
 	key int
-	// data store with key as the id and *model.TodoData as the value
-	data map[int]*model.TodoData
+	// data store with key as the id and *entity.TodoData as the value
+	data map[int]*entity.TodoData
 }
 
 // SetKey for set key to zero (for testing)
@@ -28,16 +28,16 @@ func NewMapStore() *MapStore {
 	log.Println("[Data Store] App Currently Using Map Data Store")
 	return &MapStore{
 		key:  0,
-		data: make(map[int]*model.TodoData),
+		data: make(map[int]*entity.TodoData),
 	}
 }
 
 // GetCompleted get todos that are completed
-func (ms *MapStore) GetCompleted(ctx context.Context) ([]*model.TodoData, error) {
+func (ms *MapStore) GetCompleted(ctx context.Context) ([]*entity.TodoData, error) {
 	ms.m.RLock()
 	defer ms.m.RUnlock()
 
-	completed := []*model.TodoData{}
+	completed := []*entity.TodoData{}
 	for _, todo := range ms.data {
 		if todo.Status {
 			completed = append(completed, todo.Clone())
@@ -48,11 +48,11 @@ func (ms *MapStore) GetCompleted(ctx context.Context) ([]*model.TodoData, error)
 }
 
 // GetIncomplete get todos that are incomplete
-func (ms *MapStore) GetIncomplete(ctx context.Context) ([]*model.TodoData, error) {
+func (ms *MapStore) GetIncomplete(ctx context.Context) ([]*entity.TodoData, error) {
 	ms.m.RLock()
 	defer ms.m.RUnlock()
 
-	incompleted := []*model.TodoData{}
+	incompleted := []*entity.TodoData{}
 	for _, todo := range ms.data {
 		if !todo.Status {
 			incompleted = append(incompleted, todo.Clone())
@@ -63,13 +63,13 @@ func (ms *MapStore) GetIncomplete(ctx context.Context) ([]*model.TodoData, error
 }
 
 // CreateTodo saves the todo to the map store
-func (ms *MapStore) CreateTodo(ctx context.Context, title string) (*model.TodoData, error) {
+func (ms *MapStore) CreateTodo(ctx context.Context, title string) (*entity.TodoData, error) {
 	ms.m.Lock()
 	defer ms.m.Unlock()
 
 	ms.key += 1
 
-	todo := &model.TodoData{
+	todo := &entity.TodoData{
 		ID:     ms.key,
 		Title:  title,
 		Status: false,

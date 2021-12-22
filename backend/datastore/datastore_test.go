@@ -6,8 +6,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/Xanvial/todo-app-go/backend/entity"
 	"github.com/Xanvial/todo-app-go/backend/util"
-	"github.com/Xanvial/todo-app-go/model"
 	"github.com/stretchr/testify/require"
 )
 
@@ -26,7 +26,7 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func createRandomTodo(t *testing.T) *model.TodoData {
+func createRandomTodo(t *testing.T) *entity.TodoData {
 	title := util.RandomString(10)
 	ctx := context.Background()
 
@@ -38,7 +38,7 @@ func createRandomTodo(t *testing.T) *model.TodoData {
 	return todo
 }
 
-func createRandomTodoAndTrue(t *testing.T) *model.TodoData {
+func createRandomTodoAndTrue(t *testing.T) *entity.TodoData {
 	ctx := context.Background()
 
 	todo := createRandomTodo(t)
