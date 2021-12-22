@@ -11,68 +11,42 @@
 ![demo](https://github.com/SemmiDev/todo-app-go/blob/main/.github/assets/demo.gif)
 ## Project Structure
 ```
-│   .gitignore
-│   app.env
+│   app.env 
 │   docker-compose.yaml
-│   go.mod
-│   go.sum
-│   LICENSE
+│   http.http
 │   makefile
-│   README.md
-│   req.http
 │
-├───.github
-│   └───workflows
-│           test.yml
-│
+├───bin                                     # Binary output folder
 ├───backend
 │   │   main.go                             # Main program of the app
 │   │
-│   ├───api
+│   ├───api                                 
 │   │       main_test.go
 │   │       middleware.go
 │   │       server.go
 │   │       todo.go
 │   │       todo_test.go
 │   │
-│   ├───datastore
+│   ├───datastore                           
 │   │   │   array.go
+│   │   │   datastore.go
 │   │   │   datastore_test.go
 │   │   │   map.go
 │   │   │   postgre.go
-│   │   │   store.go
 │   │   │
-│   │   └───mock
+│   │   └───mock                            # Mock our data store
 │   │           datastore.go
 │   │
-│   ├───util
+│   ├───entity                             
+│   │       todo.go                         
+│   │
+│   ├───util                               
 │   │       config.go
 │   │       random.go
 │   │
 │   └───webstatic                           # Frontend Codes, taken from https://github.com/themaxsandelin/todo
-│       │   favicon.ico
-│       │   index.html
-│       │
-│       └───resources
-│           ├───css
-│           │       reset.min.css
-│           │       style.css
-│           │
-│           └───js
-│                   jquery-3.6.0.min.js
-│                   main.js
 │
-├───bin                                     # Binary output folder
-│       todoapp
-|       todoapp.exe
-│
-├───migration                               # DB Migration data folder, contains up/down sql queries
-│       1_create_main_table.down.sql
-│       1_create_main_table.up.sql
-│       main.go                             # Script to trigger sql queries
-│
-└───model                                  
-        todo.go                             # Data model of main object
+└───migration                               # DB Migration data folder, contains up/down sql queries
 ```
 
 ## Database using Docker
