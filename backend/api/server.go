@@ -1,15 +1,18 @@
 package api
 
 import (
+	"context"
 	"embed"
 	"fmt"
 	"io/fs"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"time"
 
 	"github.com/Xanvial/todo-app-go/backend/datastore"
 	"github.com/Xanvial/todo-app-go/backend/util"
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -35,6 +38,7 @@ func NewServer(
 
 	server.setupLoggingMiddleware()
 	server.setupRecoveryMiddleware()
+	server.setupCORS()
 
 	return server
 }
@@ -77,14 +81,50 @@ func (s *Server) setupRouter(htmlData embed.FS) {
 }
 
 // Run is a function that runs the server
-func (s *Server) Start(addr string) {
-	// Optional, CORS config, to make sure it can be called from everywhere
-	headersOk := handlers.AllowedOrigins([]string{"*"})
-	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
-
-	log.Printf("[Server] HTTP server is running at port %s", addr)
-	err := http.ListenAndServe(addr, handlers.CORS(headersOk, methodsOk)(s.router))
+func (s *Server) Start() {
+	log.Printf("[Server] HTTP server is running at port %s", s.config.AppPort)
+	err := http.ListenAndServe(s.config.AppPort, s.router)
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func (s *Server) StartWithGraceful() {
+	log.Printf("[Server] HTTP server is running at port %s with gracefull shutdown", s.config.AppPort)
+	var wait time.Duration
+
+	srv := &http.Server{
+		Addr:         s.config.AppPort,
+		WriteTimeout: s.config.WriteTimeout,
+		ReadTimeout:  s.config.ReadTimeout,
+		IdleTimeout:  s.config.IdleTimeout,
+		Handler:      s.router,
+	}
+
+	// Run our server in a goroutine so that it doesn't block.
+	go func() {
+		if err := srv.ListenAndServe(); err != nil {
+			log.Println(err)
+		}
+	}()
+
+	c := make(chan os.Signal, 1)
+	// We'll accept graceful shutdowns when quit via SIGINT (Ctrl+C)
+	// SIGKILL, SIGQUIT or SIGTERM (Ctrl+/) will not be caught.
+	signal.Notify(c, os.Interrupt)
+
+	// Block until we receive our signal.
+	<-c
+
+	// Create a deadline to wait for.
+	ctx, cancel := context.WithTimeout(context.Background(), wait)
+	defer cancel()
+	// Doesn't block if no connections, but will otherwise wait
+	// until the timeout deadline.
+	srv.Shutdown(ctx)
+	// Optionally, you could run srv.Shutdown in a goroutine and block on
+	// <-ctx.Done() if your application should wait for other services
+	// to finalize based on context cancellation.
+	log.Println("shutting down")
+	os.Exit(0)
 }

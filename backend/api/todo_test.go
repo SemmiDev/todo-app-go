@@ -13,18 +13,18 @@ import (
 	"testing"
 
 	mockdb "github.com/Xanvial/todo-app-go/backend/datastore/mock"
+	"github.com/Xanvial/todo-app-go/backend/entity"
 	"github.com/Xanvial/todo-app-go/backend/util"
-	"github.com/Xanvial/todo-app-go/model"
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/require"
 )
 
-func requireBodyMatchTodo(t *testing.T, body *bytes.Buffer, todo *model.TodoData) {
+func requireBodyMatchTodo(t *testing.T, body *bytes.Buffer, todo *entity.TodoData) {
 	data, err := ioutil.ReadAll(body)
 	require.NoError(t, err)
 
-	var gotTodo model.TodoData
+	var gotTodo entity.TodoData
 	err = json.Unmarshal(data, &gotTodo)
 
 	require.NoError(t, err)
@@ -33,11 +33,11 @@ func requireBodyMatchTodo(t *testing.T, body *bytes.Buffer, todo *model.TodoData
 	require.Equal(t, todo.Status, gotTodo.Status)
 }
 
-func requireBodyMatchTodos(t *testing.T, body *bytes.Buffer, todos []*model.TodoData) {
+func requireBodyMatchTodos(t *testing.T, body *bytes.Buffer, todos []*entity.TodoData) {
 	data, err := ioutil.ReadAll(body)
 	require.NoError(t, err)
 
-	var gotTodos []*model.TodoData
+	var gotTodos []*entity.TodoData
 	err = json.Unmarshal(data, &gotTodos)
 
 	require.NoError(t, err)
@@ -317,8 +317,8 @@ func TestUpdateTodoAPI(t *testing.T) {
 	}
 }
 
-func randomTodo(t *testing.T, status bool) *model.TodoData {
-	todo := model.TodoData{
+func randomTodo(t *testing.T, status bool) *entity.TodoData {
+	todo := entity.TodoData{
 		ID:     util.RandomInt(1, 10),
 		Title:  util.RandomString(10),
 		Status: status,
@@ -327,10 +327,10 @@ func randomTodo(t *testing.T, status bool) *model.TodoData {
 	return &todo
 }
 
-func randomTodos(t *testing.T) []*model.TodoData {
-	todos := make([]*model.TodoData, 0)
+func randomTodos(t *testing.T) []*entity.TodoData {
+	todos := make([]*entity.TodoData, 0)
 	for i := 1; i <= 10; i++ {
-		todos = append(todos, &model.TodoData{
+		todos = append(todos, &entity.TodoData{
 			ID:     i,
 			Title:  util.RandomString(10),
 			Status: util.RandomBool(),
@@ -340,7 +340,7 @@ func randomTodos(t *testing.T) []*model.TodoData {
 	return todos
 }
 
-func filterTodos(t *testing.T, todos []*model.TodoData) (completed []*model.TodoData, incomplete []*model.TodoData) {
+func filterTodos(t *testing.T, todos []*entity.TodoData) (completed []*entity.TodoData, incomplete []*entity.TodoData) {
 	for _, todo := range todos {
 		if todo.Status {
 			completed = append(completed, todo)

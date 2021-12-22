@@ -26,5 +26,5 @@ func main() {
 	server := api.NewServer(config, htmlData, dataStore)
 
 	// start the server
-	server.Start(config.AppPort)
+	server.StartWithGraceful()
 }

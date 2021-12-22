@@ -1,4 +1,4 @@
-package model
+package entity
 
 // TodoData is a struct for todo data
 type TodoData struct {
