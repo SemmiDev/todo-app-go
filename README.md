@@ -16,15 +16,15 @@
 
 ## Folder Structure
 ```
-├───bin                                     # Binary output folder
+├───bin               # Binary output folder
 ├───backend
 │   ├───api                                 
 │   ├───datastore                           
-│   │   └───mock                            # Mock our data store
+│   │   └───mock      # Mock our data store
 │   ├───entity                            
 │   ├───util                               
-│   └───webstatic                           # Frontend Codes, taken from https://github.com/themaxsandelin/todo
-└───migration                               # DB Migration data folder, contains up/down sql queries
+│   └───webstatic     # Frontend Codes, taken from https://github.com/themaxsandelin/todo
+└───migration         # DB Migration data folder, contains up/down sql queries
 ```
 
 ## Database using Docker
@@ -43,4 +43,5 @@
 :heavy_check_mark: DB (Postgre SQL) Store\
 :heavy_check_mark: Unit test\
 :heavy_check_mark: API Test\
-:heavy_check_mark: Mock DB
+:heavy_check_mark: Mock DB\
+:heavy_check_mark: Workflow for run tests
