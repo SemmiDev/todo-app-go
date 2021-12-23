@@ -25,6 +25,6 @@ func main() {
 	// setup the server
 	server := api.NewServer(config, htmlData, dataStore)
 
-	// start the server
+	// start the server with graceful shutdown
 	server.StartWithGraceful()
 }

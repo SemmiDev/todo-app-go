@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/Xanvial/todo-app-go/backend/entity"
 	"github.com/Xanvial/todo-app-go/backend/util"
@@ -36,8 +37,9 @@ func NewDBStore(config util.Config) *DBStore {
 	}
 
 	// setup the connection pool
-	db.SetMaxOpenConns(20)
-	db.SetMaxIdleConns(10)
+	db.SetMaxOpenConns(25)
+	db.SetMaxIdleConns(25)
+	db.SetConnMaxLifetime(time.Minute * 5)
 
 	log.Println("[Data Store] App Currently Using Postgre SQL Data Store")
 	return &DBStore{
