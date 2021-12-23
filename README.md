@@ -18,11 +18,11 @@
 ```
 ├───bin               # Binary output folder
 ├───backend
-│   ├───api                                 
-│   ├───datastore                           
+│   ├───api           # Contains servers, routers, handlers, middlewares, etc                   
+│   ├───datastore     # Contains several data stores that can be used                       
 │   │   └───mock      # Mock our data store
-│   ├───entity                            
-│   ├───util                               
+│   ├───entity        # Represent table in database
+│   ├───util          # Contains config for app and random utilities for testing purposes 
 │   └───webstatic     # Frontend Codes, taken from https://github.com/themaxsandelin/todo
 └───migration         # DB Migration data folder, contains up/down sql queries
 ```
@@ -34,7 +34,7 @@
 4. On first run, create the table using `make db-init`
 
 ## Postgres already installed
-1. Update the config value in `util/config.go` to installed postgres configuration
+1. Update the config value in `app.env` to installed postgres configuration
 2. create the table using `make db-init`
 
 ## Checklist
