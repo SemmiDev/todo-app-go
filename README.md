@@ -1,15 +1,21 @@
 # Todo App Go
 [![tests](https://github.com/SemmiDev/todo-app-go/actions/workflows/test.yml/badge.svg)](https://github.com/SemmiDev/todo-app-go/actions/workflows/test.yml)
 
+## Completed
+:heavy_check_mark: Array Store\
+:heavy_check_mark: Map Store\
+:heavy_check_mark: DB (Postgre SQL) Store\
+:heavy_check_mark: Unit test\
+:heavy_check_mark: API Test\
+:heavy_check_mark: Mock DB\
+:heavy_check_mark: Workflow for run tests
+
 ## How to use
 - Make sure to run `go mod tidy` first to download all needed libraries
 - To run this application, call `make run` on root
 - To build only, call `make build` on root
 - Calling one of above will generate executable file in `bin` folder, that can be used to start the application
 - After app binary is running, the web can be opened in [http://localhost:8080](http://localhost:8080/)
-
-## Demo
-![demo](https://github.com/SemmiDev/todo-app-go/blob/main/.github/assets/demo.gif)
 
 ## Architecture
 `Handler` -> `Data Store`
@@ -37,11 +43,5 @@
 1. Update the config value in `app.env` to installed postgres configuration
 2. create the table using `make db-init`
 
-## Checklist
-:heavy_check_mark: Array Store\
-:heavy_check_mark: Map Store\
-:heavy_check_mark: DB (Postgre SQL) Store\
-:heavy_check_mark: Unit test\
-:heavy_check_mark: API Test\
-:heavy_check_mark: Mock DB\
-:heavy_check_mark: Workflow for run tests
+## Demo
+![demo](https://github.com/SemmiDev/todo-app-go/blob/main/.github/assets/demo.gif)
