@@ -1,6 +1,9 @@
 # Todo App Go
 [![tests](https://github.com/SemmiDev/todo-app-go/actions/workflows/test.yml/badge.svg)](https://github.com/SemmiDev/todo-app-go/actions/workflows/test.yml)
 
+---
+A very simple To Do List application for managing to-do lists. Written in Go programming language as backend and Ajax to consume API
+
 ## Completed
 :heavy_check_mark: Array Store\
 :heavy_check_mark: Map Store\
@@ -8,7 +11,7 @@
 :heavy_check_mark: Unit test\
 :heavy_check_mark: API Test\
 :heavy_check_mark: Mock DB\
-:heavy_check_mark: Workflow for run tests
+:heavy_check_mark: Workflow to run tests
 
 ## How to use
 - Make sure to run `go mod tidy` first to download all needed libraries
@@ -40,7 +43,7 @@
 4. On first run, create the table using `make db-init`
 
 ## Postgres already installed
-1. Update the config value in `app.env` to installed postgres configuration
+1. Update the config value in `app.env` to change the application configuration
 2. create the table using `make db-init`
 
 ## Demo
