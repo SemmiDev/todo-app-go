@@ -14,8 +14,8 @@ type MapStore struct {
 	m sync.RWMutex
 	// key always increment when creating new todo
 	key int
-	// data store with key as the id and *entity.TodoData as the value
-	data map[int]*entity.TodoData
+	// data store with key as the id and entity.TodoData as the value
+	data map[int]entity.TodoData
 }
 
 // SetKey for set key to zero (for testing)
@@ -28,19 +28,19 @@ func NewMapStore() *MapStore {
 	log.Println("[Data Store] App Currently Using Map Data Store")
 	return &MapStore{
 		key:  0,
-		data: make(map[int]*entity.TodoData),
+		data: make(map[int]entity.TodoData),
 	}
 }
 
 // GetCompleted get todos that are completed
-func (ms *MapStore) GetCompleted(ctx context.Context) ([]*entity.TodoData, error) {
+func (ms *MapStore) GetCompleted(ctx context.Context) ([]entity.TodoData, error) {
 	ms.m.RLock()
 	defer ms.m.RUnlock()
 
-	completed := []*entity.TodoData{}
+	completed := []entity.TodoData{}
 	for _, todo := range ms.data {
 		if todo.Status {
-			completed = append(completed, todo.Clone())
+			completed = append(completed, todo)
 		}
 	}
 
@@ -48,14 +48,14 @@ func (ms *MapStore) GetCompleted(ctx context.Context) ([]*entity.TodoData, error
 }
 
 // GetIncomplete get todos that are incomplete
-func (ms *MapStore) GetIncomplete(ctx context.Context) ([]*entity.TodoData, error) {
+func (ms *MapStore) GetIncomplete(ctx context.Context) ([]entity.TodoData, error) {
 	ms.m.RLock()
 	defer ms.m.RUnlock()
 
-	incompleted := []*entity.TodoData{}
+	incompleted := []entity.TodoData{}
 	for _, todo := range ms.data {
 		if !todo.Status {
-			incompleted = append(incompleted, todo.Clone())
+			incompleted = append(incompleted, todo)
 		}
 	}
 
@@ -63,20 +63,16 @@ func (ms *MapStore) GetIncomplete(ctx context.Context) ([]*entity.TodoData, erro
 }
 
 // CreateTodo saves the todo to the map store
-func (ms *MapStore) CreateTodo(ctx context.Context, title string) (*entity.TodoData, error) {
+func (ms *MapStore) CreateTodo(ctx context.Context, title string) (entity.TodoData, error) {
 	ms.m.Lock()
 	defer ms.m.Unlock()
 
 	ms.key += 1
 
-	todo := &entity.TodoData{
-		ID:     ms.key,
-		Title:  title,
-		Status: false,
-	}
+	todo := entity.NewTodoData(ms.key, title)
 	ms.data[ms.key] = todo
 
-	return todo.Clone(), nil
+	return todo, nil
 }
 
 // UpdateTodo updates the todo with the given id
@@ -84,10 +80,9 @@ func (ms *MapStore) UpdateTodo(ctx context.Context, ID int, status bool) error {
 	ms.m.Lock()
 	defer ms.m.Unlock()
 
-	for todoID, todo := range ms.data {
-		if todoID == ID {
-			todo.Status = status
-		}
+	if todo, ok := ms.data[ID]; ok {
+		todo.Status = status
+		ms.data[ID] = todo
 	}
 	return nil
 }
