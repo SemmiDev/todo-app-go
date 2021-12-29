@@ -2,7 +2,7 @@
 [![tests](https://github.com/SemmiDev/todo-app-go/actions/workflows/test.yml/badge.svg)](https://github.com/SemmiDev/todo-app-go/actions/workflows/test.yml)
 
 ---
-A very simple application for managing to-do lists. Written in Go as backend and Ajax to consume API
+A very simple application for managing to-do lists. Written in Go as BE and (HTML, CSS & JS) as FE
 
 ## Completed
 :heavy_check_mark: Array Store\
